@@ -13,10 +13,10 @@ namespace BlackJack
     public static class Camera
     {
         /// <summary> The three dimensional coordinates of the camera's eye. </summary>
-        private static Vector3 camera_eye_location;
+        private static Vector3 cameraeyelocation;
 
         /// <summary> The three dimensional coordinates of the center of the camera's vision. </summary>
-        private static Vector3 camera_eye_target;
+        private static Vector3 cameraeyetarget;
 
         /// <summary> The Uniform Buffer Object handle for the camera. Lets us save the location of the data so that we can modify it later if needed. </summary>
         private static int globalCameraUBO = -1;
@@ -47,8 +47,8 @@ namespace BlackJack
         /// <param name="target">The three dimensional coordinates where the camera is looking.</param>
         public static void Initialize(Size window, float z_Near, float z_Far, Vector3 location, Vector3 target)
         {
-            camera_eye_location = location;
-            camera_eye_target = target;
+            cameraeyelocation = location;
+            cameraeyetarget = target;
 
             matricies.Perspective = Matrix4.CreatePerspectiveFieldOfView(MathHelper.PiOver4, (float)(window.Width / window.Height), z_Near, z_Far);
             matricies.View = Matrix4.LookAt(location, target, new Vector3(0.0f, 1.0f, 0.0f));
@@ -67,8 +67,8 @@ namespace BlackJack
         /// <param name="move_distance">The vector to be added to the Camera's current position.</param>
         public static void Pan(Vector2 move_distance)
         {
-            camera_eye_location.X += move_distance.X;
-            camera_eye_location.Y += move_distance.Y;
+            cameraeyelocation.X += move_distance.X;
+            cameraeyelocation.Y += move_distance.Y;
             UpdateCameraInfo();
         }
 
@@ -78,7 +78,7 @@ namespace BlackJack
         /// <param name="distance">The distance to be added to the Camera's current Z location.</param>
         public static void Zoom(float distance)
         {
-            camera_eye_location.Z += distance;
+            cameraeyelocation.Z += distance;
             UpdateCameraInfo();
         }
 
@@ -87,7 +87,7 @@ namespace BlackJack
         /// </summary>
         private static void UpdateCameraInfo()
         {
-            matricies.View = Matrix4.LookAt(camera_eye_location, camera_eye_target, new Vector3(0.0f, 1.0f, 0.0f));
+            matricies.View = Matrix4.LookAt(cameraeyelocation, cameraeyetarget, new Vector3(0.0f, 1.0f, 0.0f));
 
             GL.BindBuffer(BufferTarget.UniformBuffer, globalCameraUBO);
             GL.BufferSubData(BufferTarget.UniformBuffer, IntPtr.Zero, GlobalMatrix.SizeInBytes, ref matricies);
