@@ -47,6 +47,8 @@ namespace BlackJack
             GL.DepthRange(0.0f, 1.0f);
 
             this.KeyDown += this.Window_KeyDown;
+
+            Camera.Initialize(this.Size, 0.1f, 100f, new Vector3(0.0f, 0.0f, 5.0f), Vector3.Zero);
         }
 
         /// <summary>
