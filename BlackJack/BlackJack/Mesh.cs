@@ -2,6 +2,7 @@
 {
     using System;
     using System.Collections.Generic;
+    using System.IO;
     using OpenTK;
 
     
@@ -13,11 +14,18 @@
 
         private List<int[]> faceList = new List<int[]>();
 
-        public Mesh(string modeldata)
+        public Mesh(string filename)
         {
-            foreach (string line in modeldata.Split('\n'))
+            string line;
+            using (FileStream fs = new FileStream(filename, FileMode.Open, FileAccess.Read, FileShare.ReadWrite))
             {
-                this.ParseLine(line);
+                using (StreamReader stream = new StreamReader(fs, System.Text.Encoding.UTF8, true, 128))
+                {
+                    while ((line = stream.ReadLine()) != null)
+                    {
+                        this.ParseLine(line);
+                    }
+                }
             }
         }
 
@@ -77,7 +85,6 @@
                                 normFace--;
                                 this.faceList.Add(new int[] { vertFace, texFace, normFace });
                             }
-
                             break;
                         }
                 }
