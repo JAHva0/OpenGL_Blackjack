@@ -32,7 +32,7 @@ namespace BlackJack
         public static void Load()
         {
             // Locate the shader folder in this project.
-            string shaderfolder = Directory.GetCurrentDirectory().Substring(0, Directory.GetCurrentDirectory().IndexOf("BlackJack")) + @"BlackJack\BlackJack\Shaders";
+            string shaderfolder = Program.CurrentDirectory + @"BlackJack\BlackJack\Shaders";
 
             foreach (string shaderfile in Directory.GetFiles(shaderfolder, "*.glsl"))
             {
