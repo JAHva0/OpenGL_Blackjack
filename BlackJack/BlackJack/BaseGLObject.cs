@@ -31,14 +31,24 @@ namespace BlackJack
         /// <summary> The Uniform Block reference for the camera matrices. </summary>
         private int globalCameraMatrix = -1;
 
-        private int U_location = -1;
-        private int U_rotation = -1;
-        private int U_scale = -1;
+        /// <summary> The Location of the location uniform. </summary>
+        private int ulocation = -1;
+
+        /// <summary> The Location of the rotation uniform. </summary>
+        private int urotation = -1;
+
+        /// <summary> The Location of the scale uniform. </summary>
+        private int uscale = -1;
 
         //// -----------------------Transforms-----------------------
 
+        /// <summary> The value to pass to the location uniform. </summary>
         private Vector3 location = new Vector3(0.0f, 0.0f, 0.0f);
+
+        /// <summary> The value to pass to the rotation uniform. </summary>
         private Matrix4 rotation = Matrix4.Identity;
+
+        /// <summary> The value to pass to the scale uniform. </summary>
         private Matrix4 scale = Matrix4.Identity;
         
         /// <summary>
@@ -65,13 +75,13 @@ namespace BlackJack
             this.globalCameraMatrix = GL.GetUniformBlockIndex(this.shaderProgram, "GlobalCamera");
 
             // Get the location of the rest of the uniforms.
-            this.U_location = GL.GetUniformLocation(this.shaderProgram, "location");
-            this.U_rotation = GL.GetUniformLocation(this.shaderProgram, "rotation");
-            this.U_scale = GL.GetUniformLocation(this.shaderProgram, "scale");
+            this.ulocation = GL.GetUniformLocation(this.shaderProgram, "location");
+            this.urotation = GL.GetUniformLocation(this.shaderProgram, "rotation");
+            this.uscale = GL.GetUniformLocation(this.shaderProgram, "scale");
 
             GL.UseProgram(this.shaderProgram);
             GL.UniformBlockBinding(this.shaderProgram, this.globalCameraMatrix, Camera.GlobalUBO);
-            GL.Uniform3(this.U_location, this.location);
+            GL.Uniform3(this.ulocation, this.location);
             GL.UseProgram(0);
 
             this.InitializeBufferObjects(model);
@@ -79,26 +89,46 @@ namespace BlackJack
             this.InitialzeVertexObject();
         }
 
+        /// <summary>
+        /// Rotate the object along the X axis.
+        /// </summary>
+        /// <param name="angle">The amount to rotate.</param>
         public void RotateX(float angle)
         {
             this.rotation *= Matrix4.CreateRotationX(angle);
         }
 
+        /// <summary>
+        /// Rotate the object along the Y axis.
+        /// </summary>
+        /// <param name="angle">The amount to rotate.</param>
         public void RotateY(float angle)
         {
             this.rotation *= Matrix4.CreateRotationY(angle);
         }
 
+        /// <summary>
+        /// Rotate the object along the Z axis.
+        /// </summary>
+        /// <param name="angle">The amount to rotate.</param>
         public void RotateZ(float angle)
         {
             this.rotation *= Matrix4.CreateRotationZ(angle);
         }
 
+        /// <summary>
+        /// Scale the object.
+        /// </summary>
+        /// <param name="scale">The amount to grow or shrink.</param>
         public void Scale(float scale)
         {
             this.scale *= Matrix4.CreateScale(scale);
         }
 
+        /// <summary>
+        /// Set the position of the center of the object to a particular set of coordinates.
+        /// </summary>
+        /// <param name="position">Where the object should be drawn.</param>
         public void SetPosition(Vector3 position)
         {
             this.location = position;
@@ -112,9 +142,9 @@ namespace BlackJack
             GL.UseProgram(this.shaderProgram);
 
             // Set the uniforms
-            GL.UniformMatrix4(this.U_rotation, false, ref this.rotation);
-            GL.UniformMatrix4(this.U_scale, false, ref this.scale);
-            GL.Uniform3(this.U_location, ref this.location);
+            GL.UniformMatrix4(this.urotation, false, ref this.rotation);
+            GL.UniformMatrix4(this.uscale, false, ref this.scale);
+            GL.Uniform3(this.ulocation, ref this.location);
 
             // Draw the object
             GL.BindVertexArray(this.vertexArrayObject);
