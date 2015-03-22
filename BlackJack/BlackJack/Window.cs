@@ -14,6 +14,11 @@ namespace BlackJack
     public class Window : GameWindow
     {
         /// <summary>
+        /// Testing object.
+        /// </summary>
+        private BaseGLObject obj;
+        
+        /// <summary>
         /// Initializes a new instance of the <see cref="Window"/> class.
         /// </summary>
         /// <param name="windowDimensions">The dimensions of the window in pixels.</param>
@@ -48,8 +53,10 @@ namespace BlackJack
 
             this.KeyDown += this.Window_KeyDown;
 
-            Camera.Initialize(this.Size, 0.1f, 100f, new Vector3(0.0f, 0.0f, 5.0f), Vector3.Zero);
+            Camera.Initialize(this.Size, 0.1f, 100f, new Vector3(1.0f, 1.0f, 10.0f), Vector3.Zero);
             Shaders.Load();
+
+            this.obj = new BaseGLObject();
         }
 
         /// <summary>
@@ -71,6 +78,10 @@ namespace BlackJack
         protected override void OnUpdateFrame(FrameEventArgs e)
         {
             base.OnUpdateFrame(e);
+
+            this.obj.RotateX(0.05f);
+            this.obj.RotateY(0.01f);
+            this.obj.RotateZ(0.005f);
         }
 
         /// <summary>
@@ -82,6 +93,8 @@ namespace BlackJack
             base.OnRenderFrame(e);
 
             GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
+
+            this.obj.Render();
 
             this.SwapBuffers();
         }

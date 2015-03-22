@@ -1,9 +1,14 @@
 ﻿#version 330
 
-layout (location = 0) in vec4 position;
-layout (location = 1) in vec4 color;
+layout (location = 0) in vec3 position;
+layout (location = 1) in vec2 texture;
+layout (location = 2) in vec3 normal;
 
 smooth out vec4 theColor;
+
+uniform vec3 location;
+uniform mat4 rotation;
+uniform mat4 scale;
 
 layout(std140) uniform GlobalCamera
 {
@@ -11,11 +16,9 @@ layout(std140) uniform GlobalCamera
 	mat4 cameraPerspective;
 };
 
-uniform vec3 location;
-
 void main()
 {   
-    gl_Position = (cameraPerspective * cameraView) * position;
+    gl_Position = (cameraPerspective * cameraView) * rotation * vec4(position, 1.0);
 
-    theColor = color;
+    theColor = vec4(1.0f, 0.0f, 1.0f, 1.0f);
 }

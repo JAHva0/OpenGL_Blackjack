@@ -52,10 +52,14 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
+    <None Include="Models\Box.obj" />
+    <None Include="Models\Card.obj" />
     <None Include="packages.config" />
+    <None Include="Shaders\FragmentShader.glsl" />
+    <None Include="Shaders\VertexShader.glsl" />
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="Shaders\" />
+    <Content Include="Textures\SquareCountingpng.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="$(ProgramFiles)\MSBuild\StyleCop\v4.7\StyleCop.targets" />
