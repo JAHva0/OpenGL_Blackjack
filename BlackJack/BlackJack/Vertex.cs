@@ -53,11 +53,11 @@ namespace BlackJack
 
         /// <summary> Gets an integer representation of a vertex point in bytes. </summary>
         /// <value> The size in bytes of the Vertex structure. </value>
-        public static IntPtr SizeInBytes
+        public static int SizeInBytes
         {
             get
             {
-                return (IntPtr)(Vector3.SizeInBytes + Vector2.SizeInBytes + Vector3.SizeInBytes);
+                return Vector3.SizeInBytes + Vector2.SizeInBytes + Vector3.SizeInBytes;
             }
         }
 
@@ -79,6 +79,15 @@ namespace BlackJack
             {
                 return (IntPtr)(Vector3.SizeInBytes + Vector2.SizeInBytes);
             }
+        }
+
+        /// <summary>
+        /// Returns the System.string representation of the current Vector object.
+        /// </summary>
+        /// <returns> A string representation of the current Vector object.</returns>
+        public override string ToString()
+        {
+            return string.Format("V:{0}, T:{1}, N:{2}", this.position, this.texture, this.normal);
         }
     }
 }
