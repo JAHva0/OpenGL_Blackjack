@@ -101,7 +101,7 @@ namespace BlackJack
         /// <param name="angle">The amount to rotate.</param>
         public void RotateX(float angle)
         {
-            this.rotation *= Matrix4.CreateRotationX((float)(Math.PI/180) * angle);
+            this.rotation *= Matrix4.CreateRotationX((float)(Math.PI / 180) * angle);
         }
 
         /// <summary>
