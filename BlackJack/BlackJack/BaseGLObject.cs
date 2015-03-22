@@ -94,6 +94,16 @@ namespace BlackJack
             this.rotation *= Matrix4.CreateRotationZ(angle);
         }
 
+        public void Scale(float scale)
+        {
+            this.scale *= Matrix4.CreateScale(scale);
+        }
+
+        public void SetPosition(Vector3 position)
+        {
+            this.location = position;
+        }
+
         /// <summary>
         /// Render the object.
         /// </summary>
@@ -103,9 +113,14 @@ namespace BlackJack
 
             // Set the uniforms
             GL.UniformMatrix4(this.U_rotation, false, ref this.rotation);
+            GL.UniformMatrix4(this.U_scale, false, ref this.scale);
+            GL.Uniform3(this.U_location, ref this.location);
 
+            // Draw the object
             GL.BindVertexArray(this.vertexArrayObject);
             GL.DrawElements(PrimitiveType.Triangles, this.indexCount, DrawElementsType.UnsignedShort, 0);
+
+            // Reset 
             GL.BindVertexArray(0);
             GL.UseProgram(0);
         }

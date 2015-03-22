@@ -18,7 +18,7 @@ layout(std140) uniform GlobalCamera
 
 void main()
 {   
-    gl_Position = (cameraPerspective * cameraView) * rotation * vec4(position, 1.0);
+    gl_Position = (cameraPerspective * cameraView) * rotation * scale * vec4((position + location), 1.0);
 
     theColor = vec4(1.0f, 0.0f, 1.0f, 1.0f);
 }
