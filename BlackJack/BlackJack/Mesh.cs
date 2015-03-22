@@ -144,6 +144,7 @@ namespace BlackJack
                                         {
                                             int vertFace, texFace, normFace;
                                             int.TryParse(subData, out vertFace);
+                                            vertFace--;
                                             texFace = 0;
                                             normFace = 0;
                                             this.faceList.Add(new int[] { vertFace, texFace, normFace });
@@ -160,6 +161,8 @@ namespace BlackJack
                                             int vertFace, texFace, normFace;
                                             int.TryParse(subData.Split('/')[0], out vertFace);
                                             int.TryParse(subData.Split('/')[1], out texFace);
+                                            vertFace--;
+                                            texFace--;
                                             normFace = 0;
                                             this.faceList.Add(new int[] { vertFace, texFace, normFace });
                                         }
@@ -176,6 +179,9 @@ namespace BlackJack
                                             int.TryParse(subData.Split('/')[0], out vertFace);
                                             int.TryParse(subData.Split('/')[1], out texFace);
                                             int.TryParse(subData.Split('/')[2], out normFace);
+                                            vertFace--;
+                                            texFace--;
+                                            normFace--;
                                             this.faceList.Add(new int[] { vertFace, texFace, normFace });
                                         }
 
@@ -201,7 +207,7 @@ namespace BlackJack
 
             foreach (int[] face in this.faceList)
             {
-                string faceID = string.Format("{0}{1}{2}", face[0], face[1], face[2]);
+                string faceID = string.Format("{0}/{1}/{2}", face[0], face[1], face[2]);
 
                 if (!vertIndex.ContainsKey(faceID))
                 {
