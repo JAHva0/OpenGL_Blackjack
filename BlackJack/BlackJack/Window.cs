@@ -44,19 +44,24 @@ namespace BlackJack
             // Tells OpenGL to cull faces that appear in the back, and that our front faces will be winding clockwise.
             GL.Enable(EnableCap.CullFace);
             GL.CullFace(CullFaceMode.Back);
-            GL.FrontFace(FrontFaceDirection.Cw);
+            GL.FrontFace(FrontFaceDirection.Ccw);
 
+            // Enable depth testing
             GL.Enable(EnableCap.DepthTest);
             GL.DepthMask(true);
             GL.DepthFunc(DepthFunction.Lequal);
             GL.DepthRange(0.0f, 1.0f);
 
+            // Enable Textures
+            GL.Enable(EnableCap.Texture2D);
+
             this.KeyDown += this.Window_KeyDown;
 
-            Camera.Initialize(this.Size, 0.1f, 100f, new Vector3(1.0f, 1.0f, 10.0f), Vector3.Zero);
+            Camera.Initialize(this.Size, 0.1f, 100f, new Vector3(0.0f, 0.0f, 10.0f), Vector3.Zero);
             Shaders.Load();
 
             this.obj = new BaseGLObject();
+            this.obj.RotateX(45);
         }
 
         /// <summary>
@@ -79,9 +84,9 @@ namespace BlackJack
         {
             base.OnUpdateFrame(e);
 
-            this.obj.RotateX(0.05f);
-            this.obj.RotateY(0.01f);
-            this.obj.RotateZ(0.005f);
+            this.obj.RotateX(0.01f);
+            this.obj.RotateY(0.03f);
+            this.obj.RotateZ(0.05f);
         }
 
         /// <summary>

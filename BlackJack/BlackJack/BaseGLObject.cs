@@ -3,6 +3,8 @@
 namespace BlackJack
 {
     using System;
+    using System.Drawing;
+    using System.Drawing.Imaging;
     using OpenTK;
     using OpenTK.Graphics.OpenGL;
     
@@ -19,6 +21,8 @@ namespace BlackJack
 
         /// <summary> The handle for the index buffer data. </summary>
         private int indexBufferObject = -1;
+
+        private int textureBufferObject = -1;
 
         /// <summary> The handle for the shader program used by this object. </summary>
         private int shaderProgram = -1;
@@ -87,6 +91,8 @@ namespace BlackJack
             this.InitializeBufferObjects(model);
 
             this.InitialzeVertexObject();
+
+            this.CreateTexture(Program.CurrentDirectory + @"BlackJack\BlackJack\Textures\SquareCounting.png");
         }
 
         /// <summary>
@@ -195,6 +201,22 @@ namespace BlackJack
             GL.BindBuffer(BufferTarget.ElementArrayBuffer, this.indexBufferObject);
 
             GL.BindVertexArray(0);
+        }
+
+        private void CreateTexture(string textureFile)
+        {
+            Bitmap bmp = (Bitmap)Image.FromFile(textureFile);
+            BitmapData data = bmp.LockBits(new Rectangle(0, 0, bmp.Width, bmp.Height), ImageLockMode.ReadOnly, System.Drawing.Imaging.PixelFormat.Format32bppArgb);
+            GL.GenTextures(1, out this.textureBufferObject);
+            GL.BindTexture(TextureTarget.Texture2D, this.textureBufferObject);
+            GL.TexImage2D(TextureTarget.Texture2D, 0, PixelInternalFormat.Rgba, data.Width, data.Height, 0, OpenTK.Graphics.OpenGL.PixelFormat.Bgra, PixelType.UnsignedByte, data.Scan0);
+            bmp.UnlockBits(data);
+
+            GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMinFilter, (int)TextureMinFilter.Linear);
+            GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMagFilter, (int)TextureMagFilter.Linear);
+
+            GL.ActiveTexture(TextureUnit.Texture0);
+            GL.BindTexture(TextureTarget.Texture2D, this.textureBufferObject);
         }
     }
 }
