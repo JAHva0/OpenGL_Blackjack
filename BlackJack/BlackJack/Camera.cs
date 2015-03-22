@@ -50,7 +50,7 @@ namespace BlackJack
             cameraeyelocation = location;
             cameraeyetarget = target;
 
-            matricies.Perspective = Matrix4.CreatePerspectiveFieldOfView(MathHelper.PiOver4, (float)(window.Width / window.Height), z_Near, z_Far);
+            matricies.Perspective = Matrix4.CreatePerspectiveFieldOfView(MathHelper.PiOver4, (float)window.Width / (float)window.Height, z_Near, z_Far);
             matricies.View = Matrix4.LookAt(location, target, new Vector3(0.0f, 1.0f, 0.0f));
 
             GL.GenBuffers(1, out globalCameraUBO);
