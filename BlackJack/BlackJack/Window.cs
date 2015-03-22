@@ -84,9 +84,7 @@ namespace BlackJack
         {
             base.OnUpdateFrame(e);
 
-            this.obj.RotateX(0.01f);
-            this.obj.RotateY(0.03f);
-            this.obj.RotateZ(0.05f);
+            this.obj.RotateY(2f);
         }
 
         /// <summary>
