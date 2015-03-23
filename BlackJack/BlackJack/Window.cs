@@ -61,11 +61,11 @@ namespace BlackJack
 
             Camera.Initialize(this.Size, 0.1f, 100f, new Vector3(0.0f, 0.0f, 15.0f), Vector3.Zero);
             Shaders.Load();
-            this.testLight = new Light("Main", new Vector3(0.0f, 0.0f, 0.0f), new Vector3(1.0f, 1.0f, 1.0f));
+            this.testLight = new Light("Main", new Vector3(0.0f, 0.0f, 10.0f), new Vector3(1.0f, 1.0f, 1.0f));
 
             this.obj = new BaseGLObject();
             //this.obj.RotateX(45);
-            //this.obj.RotateY(180);
+            //this.obj.RotateY(45);
         }
 
         /// <summary>
@@ -88,7 +88,7 @@ namespace BlackJack
         {
             base.OnUpdateFrame(e);
 
-            this.obj.RotateY(1f);
+            //this.obj.RotateY(.5f);
         }
 
         /// <summary>
