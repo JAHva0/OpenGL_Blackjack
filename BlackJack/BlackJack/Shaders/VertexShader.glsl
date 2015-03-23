@@ -4,11 +4,11 @@ layout (location = 0) in vec3 position;
 layout (location = 1) in vec2 texture;
 layout (location = 2) in vec3 normal;
 
-out vec2 UV;
+out vec3 fragVert;
+out vec2 fragTexCoord;
+out vec3 fragNormal;
 
-uniform vec3 location;
-uniform mat4 rotation;
-uniform mat4 scale;
+uniform mat4 model;
 
 layout(std140) uniform GlobalCamera
 {
@@ -18,7 +18,9 @@ layout(std140) uniform GlobalCamera
 
 void main()
 {   
-    gl_Position = (cameraPerspective * cameraView) * rotation * scale * vec4((position + location), 1.0);
+	gl_Position = cameraPerspective * cameraView * model * vec4(position, 1.0);
 
-    UV = texture;
+    fragVert = position;
+	fragTexCoord = texture;
+	fragNormal = normal;
 }

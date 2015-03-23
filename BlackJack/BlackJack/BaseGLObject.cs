@@ -35,19 +35,16 @@ namespace BlackJack
         /// <summary> The Uniform Block reference for the camera matrices. </summary>
         private int globalCameraMatrix = -1;
 
-        /// <summary> The Location of the location uniform. </summary>
-        private int ulocation = -1;
+        /// <summary> The Uniform Block reference for the light vectors. </summary>
+        private int globalLight = -1;
 
-        /// <summary> The Location of the rotation uniform. </summary>
-        private int urotation = -1;
-
-        /// <summary> The Location of the scale uniform. </summary>
-        private int uscale = -1;
+        /// <summary> The Location of the model matrix uniform. </summary>
+        private int uModelMatrix = -1;
 
         //// -----------------------Transforms-----------------------
 
         /// <summary> The value to pass to the location uniform. </summary>
-        private Vector3 location = new Vector3(0.0f, 0.0f, 0.0f);
+        private Matrix4 location = Matrix4.Identity;
 
         /// <summary> The value to pass to the rotation uniform. </summary>
         private Matrix4 rotation = Matrix4.Identity;
@@ -62,7 +59,7 @@ namespace BlackJack
         public BaseGLObject()
         {
             // Load the basic box model
-            Mesh model = new Mesh(Program.CurrentDirectory + @"BlackJack\BlackJack\Models\Box.obj");
+            Mesh model = new Mesh(Program.CurrentDirectory + @"BlackJack\BlackJack\Models\Cube_Export.obj");
 
             this.indexCount = model.Indicies.Length;
 
@@ -78,14 +75,15 @@ namespace BlackJack
             // Get the Block index for the camera.
             this.globalCameraMatrix = GL.GetUniformBlockIndex(this.shaderProgram, "GlobalCamera");
 
-            // Get the location of the rest of the uniforms.
-            this.ulocation = GL.GetUniformLocation(this.shaderProgram, "location");
-            this.urotation = GL.GetUniformLocation(this.shaderProgram, "rotation");
-            this.uscale = GL.GetUniformLocation(this.shaderProgram, "scale");
+            // Get the Block index for the light
+            this.globalLight = GL.GetUniformBlockIndex(this.shaderProgram, "Light");
+
+            // Get the location of the model matrix uniform.
+            this.uModelMatrix = GL.GetUniformLocation(this.shaderProgram, "model");
 
             GL.UseProgram(this.shaderProgram);
             GL.UniformBlockBinding(this.shaderProgram, this.globalCameraMatrix, Camera.GlobalUBO);
-            GL.Uniform3(this.ulocation, this.location);
+            GL.UniformBlockBinding(this.shaderProgram, this.globalLight, Light.LightsInScene["Main"].GlobalBindingIndex);
             GL.UseProgram(0);
 
             this.InitializeBufferObjects(model);
@@ -137,7 +135,7 @@ namespace BlackJack
         /// <param name="position">Where the object should be drawn.</param>
         public void SetPosition(Vector3 position)
         {
-            this.location = position;
+            this.location = Matrix4.CreateTranslation(position);
         }
 
         /// <summary>
@@ -147,10 +145,9 @@ namespace BlackJack
         {
             GL.UseProgram(this.shaderProgram);
 
-            // Set the uniforms
-            GL.UniformMatrix4(this.urotation, false, ref this.rotation);
-            GL.UniformMatrix4(this.uscale, false, ref this.scale);
-            GL.Uniform3(this.ulocation, ref this.location);
+            // Set the model matrix uniform
+            Matrix4 modelMatrix = this.scale * this.rotation * this.location; // The order of the multiplication is important.
+            GL.UniformMatrix4(this.uModelMatrix, false, ref modelMatrix);
 
             // Draw the object
             GL.BindVertexArray(this.vertexArrayObject);
