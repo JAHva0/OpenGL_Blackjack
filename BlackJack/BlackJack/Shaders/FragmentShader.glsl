@@ -1,12 +1,14 @@
 ﻿#version 330
 
-in vec2 UV; // Value from the Vertex 
+in vec2 UV;
+in vec3 color;
 
 uniform sampler2D textureSampler;
 
-out vec3 outputColor;
+out vec4 finalColor;
 
 void main()
-{
-    outputColor = texture(textureSampler, UV).rgb;
+{	
+	vec4 outputColor = texture(textureSampler, UV);
+	finalColor = vec4((outputColor.rgb * color), outputColor.a);
 }

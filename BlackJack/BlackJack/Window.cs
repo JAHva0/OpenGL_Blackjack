@@ -17,6 +17,8 @@ namespace BlackJack
         /// Testing object.
         /// </summary>
         private BaseGLObject obj;
+
+        private Light testLight;
         
         /// <summary>
         /// Initializes a new instance of the <see cref="Window"/> class.
@@ -57,11 +59,13 @@ namespace BlackJack
 
             this.KeyDown += this.Window_KeyDown;
 
-            Camera.Initialize(this.Size, 0.1f, 100f, new Vector3(0.0f, 0.0f, 10.0f), Vector3.Zero);
+            Camera.Initialize(this.Size, 0.1f, 100f, new Vector3(0.0f, 0.0f, 15.0f), Vector3.Zero);
             Shaders.Load();
+            this.testLight = new Light("Main", new Vector3(0.0f, 0.0f, 0.0f), new Vector3(1.0f, 1.0f, 1.0f));
 
             this.obj = new BaseGLObject();
-            this.obj.RotateX(45);
+            //this.obj.RotateX(45);
+            //this.obj.RotateY(180);
         }
 
         /// <summary>
@@ -84,7 +88,7 @@ namespace BlackJack
         {
             base.OnUpdateFrame(e);
 
-            this.obj.RotateY(2f);
+            this.obj.RotateY(1f);
         }
 
         /// <summary>
@@ -111,6 +115,24 @@ namespace BlackJack
         {
             switch (e.Key)
             {
+                case Key.R:
+                    {
+                        // Move the object to a random location
+                        Random r = new Random();
+                        Vector3 newLocation = new Vector3(r.Next(-5, 5), r.Next(-5, 5), r.Next(-5, 5));
+                        this.obj.SetPosition(newLocation);
+                        break;
+                    }
+                case Key.Up:
+                    {
+                        this.obj.Scale(1.1f);
+                        break;
+                    }
+                case Key.Down:
+                    {
+                        this.obj.Scale(0.9f);
+                        break;
+                    }
                 default: break;
             }
         }

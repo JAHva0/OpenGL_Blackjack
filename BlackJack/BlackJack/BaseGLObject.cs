@@ -59,7 +59,7 @@ namespace BlackJack
         public BaseGLObject()
         {
             // Load the basic box model
-            Mesh model = new Mesh(Program.CurrentDirectory + @"BlackJack\BlackJack\Models\Cube_Export.obj");
+            Mesh model = new Mesh(Program.CurrentDirectory + @"BlackJack\BlackJack\Models\Monkey.obj");
 
             this.indexCount = model.Indicies.Length;
 
@@ -79,7 +79,7 @@ namespace BlackJack
             this.globalLight = GL.GetUniformBlockIndex(this.shaderProgram, "Light");
 
             // Get the location of the model matrix uniform.
-            this.uModelMatrix = GL.GetUniformLocation(this.shaderProgram, "model");
+            this.uModelMatrix = GL.GetUniformLocation(this.shaderProgram, "modelMatrix");
 
             GL.UseProgram(this.shaderProgram);
             GL.UniformBlockBinding(this.shaderProgram, this.globalCameraMatrix, Camera.GlobalUBO);
@@ -90,7 +90,7 @@ namespace BlackJack
 
             this.InitialzeVertexObject();
 
-            this.CreateTexture(Program.CurrentDirectory + @"BlackJack\BlackJack\Textures\SquareCounting.png");
+            this.CreateTexture(Program.CurrentDirectory + @"BlackJack\BlackJack\Textures\monkey paint.png");
         }
 
         /// <summary>

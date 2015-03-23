@@ -43,6 +43,7 @@
   <ItemGroup>
     <Compile Include="BaseGLObject.cs" />
     <Compile Include="Camera.cs" />
+    <Compile Include="Light.cs" />
     <Compile Include="Mesh.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -52,14 +53,16 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
-    <None Include="Models\Box.obj" />
     <None Include="Models\Card.obj" />
+    <None Include="Models\Cube_export.obj" />
+    <None Include="Models\Monkey.obj" />
     <None Include="Models\Quad.obj" />
     <None Include="packages.config" />
     <None Include="Shaders\FragmentShader.glsl" />
     <None Include="Shaders\VertexShader.glsl" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="Textures\monkey paint.png" />
     <Content Include="Textures\SquareCounting.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
