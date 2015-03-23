@@ -200,8 +200,17 @@ namespace BlackJack
             GL.BindVertexArray(0);
         }
 
+        /// <summary>
+        /// Loads a texture from a file.
+        /// </summary>
+        /// <param name="textureFile">The file to load.</param>
         private void CreateTexture(string textureFile)
         {
+            if (!System.IO.File.Exists(textureFile))
+            {
+                throw new Exception("Texture File Not Found: " + textureFile);
+            }
+            
             Bitmap bmp = (Bitmap)Image.FromFile(textureFile);
             BitmapData data = bmp.LockBits(new Rectangle(0, 0, bmp.Width, bmp.Height), ImageLockMode.ReadOnly, System.Drawing.Imaging.PixelFormat.Format32bppArgb);
             GL.GenTextures(1, out this.textureBufferObject);
