@@ -66,6 +66,25 @@ namespace BlackJack
             LightsInScene.Add(name, this);
         }
 
+        public void SetPosition(Vector3 newPosition)
+        {
+            this.lightInfo.location = newPosition;
+            this.UpdateLightInfo();
+        }
+
+        public void Move(Vector3 amount)
+        {
+            this.lightInfo.location += amount;
+            this.UpdateLightInfo();
+        }
+
+        private void UpdateLightInfo()
+        {
+            GL.BindBuffer(BufferTarget.UniformBuffer, this.globalLightUBO);
+            GL.BufferSubData(BufferTarget.UniformBuffer, IntPtr.Zero, (IntPtr)(Vector3.SizeInBytes * 2), ref lightInfo);
+            GL.BindBuffer(BufferTarget.UniformBuffer, 0);
+        }
+
         private struct Info
         {
             public Vector3 location;
