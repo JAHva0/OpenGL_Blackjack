@@ -118,6 +118,7 @@ namespace BlackJack
                             Vector2 newTexVert = new Vector2();
                             float.TryParse(data.Split(' ')[1], out newTexVert.X);
                             float.TryParse(data.Split(' ')[2], out newTexVert.Y);
+                            newTexVert.Y = 1 - newTexVert.Y; // Why? Look into why blender flips this.
                             this.textureList.Add(newTexVert);
                             break;
                         }
@@ -180,7 +181,11 @@ namespace BlackJack
                                             int.TryParse(subData.Split('/')[1], out texFace);
                                             int.TryParse(subData.Split('/')[2], out normFace);
                                             vertFace--;
-                                            texFace--;
+                                            // There can be a case where the texture attribute is empty, in which case keep this 0.
+                                            if (texFace > 0)
+                                            {
+                                                texFace--;
+                                            }
                                             normFace--;
                                             this.faceList.Add(new int[] { vertFace, texFace, normFace });
                                         }
