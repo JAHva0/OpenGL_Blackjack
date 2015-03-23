@@ -19,12 +19,12 @@ layout(std140) uniform Light
 void main()
 {	
 	// Light emission properties
-	float lightPower = 10.0f;
+	float lightPower = 150.0f;
 
 	// Material Properties
 	vec3 MaterialDiffuseColor = texture2D(textureSampler, UV).rgb;
-	vec3 MaterialAmbientColor = vec3(0.1f, 0.1f, 0.1f) * MaterialDiffuseColor;
-	vec3 MaterialSpecularColor = vec3(0.3f, 0.3f, 0.3f);
+	vec3 MaterialAmbientColor = vec3(0.05f, 0.05f, 0.05f) * MaterialDiffuseColor;
+	vec3 MaterialSpecularColor = vec3(0.2f, 0.2f, 0.2f);
 
 	// Distance to the light source
 	float distance = length(lightPosition - Position_worldspace);

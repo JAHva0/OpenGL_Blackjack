@@ -3,6 +3,7 @@
 namespace BlackJack
 {
     using System;
+    using System.Collections.Generic;
     using System.Drawing;
     using OpenTK;
     using OpenTK.Graphics.OpenGL;
@@ -16,9 +17,11 @@ namespace BlackJack
         /// <summary>
         /// Testing object.
         /// </summary>
-        private BaseGLObject obj;
+        private List<BaseGLObject> obj = new List<BaseGLObject>();
 
         private Light testLight;
+        private float lightAngle = 0;
+        private float lightrotationSpeed = 0.05f;
         
         /// <summary>
         /// Initializes a new instance of the <see cref="Window"/> class.
@@ -41,7 +44,7 @@ namespace BlackJack
         {
             base.OnLoad(e);
 
-            GL.ClearColor(Color.CornflowerBlue);
+            GL.ClearColor(Color.Black);
 
             // Tells OpenGL to cull faces that appear in the back, and that our front faces will be winding clockwise.
             GL.Enable(EnableCap.CullFace);
@@ -59,13 +62,30 @@ namespace BlackJack
 
             this.KeyDown += this.Window_KeyDown;
 
-            Camera.Initialize(this.Size, 0.1f, 100f, new Vector3(0.0f, 0.0f, 15.0f), Vector3.Zero);
+            Camera.Initialize(this.Size, 0.1f, 100f, new Vector3(0.0f, 0.0f, 25.0f), Vector3.Zero);
             Shaders.Load();
-            this.testLight = new Light("Main", new Vector3(0.0f, 0.0f, 10.0f), new Vector3(1.0f, 1.0f, 1.0f));
+            this.testLight = new Light("Main", new Vector3(10.0f, 0.0f, 0.0f), new Vector3(1.0f, 1.0f, 1.0f));
 
-            this.obj = new BaseGLObject();
-            //this.obj.RotateX(45);
-            //this.obj.RotateY(45);
+            float numMonkeys = 10f;
+            float monkeyStep = 2.5f;
+
+            for (float x = -numMonkeys; x <= numMonkeys; x += monkeyStep)
+            {
+                for (float y = -numMonkeys; y <= numMonkeys; y += monkeyStep)
+                {
+                    for (float z = -numMonkeys; z <= numMonkeys; z += monkeyStep)
+                    {
+                        BaseGLObject newobj = new BaseGLObject();
+                        Vector3 newLocation = new Vector3(x, y, z);
+                        Random r = new Random();
+                        newobj.RotateX(r.Next(0, 180));
+                        newobj.RotateY(r.Next(0, 180));
+                        newobj.RotateZ(r.Next(0, 180));
+                        newobj.SetPosition(newLocation);
+                        this.obj.Add(newobj);
+                    }
+                }
+            }
         }
 
         /// <summary>
@@ -88,7 +108,28 @@ namespace BlackJack
         {
             base.OnUpdateFrame(e);
 
-            //this.obj.RotateY(.5f);
+            foreach (BaseGLObject o in this.obj)
+            {
+                o.RotateY(0.5f);
+            }
+
+            Light.LightsInScene["Main"].SetPosition(
+                new Vector3(
+                    (float)(5 * Math.Sin(this.lightAngle)), 
+                    0f, 
+                    (float)(5 * Math.Cos(this.lightAngle))));
+
+            this.lightAngle += this.lightrotationSpeed;
+            if (Math.Abs(this.lightAngle) > 2 * Math.PI)
+            {
+                Random r = new Random();
+                this.lightrotationSpeed = (float)r.Next(3, 10) / 100;
+                if (r.Next(0, 2) == 1)
+                {
+                    this.lightrotationSpeed = -this.lightrotationSpeed;
+                }
+                this.lightAngle = 0;
+            }
         }
 
         /// <summary>
@@ -101,7 +142,10 @@ namespace BlackJack
 
             GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
 
-            this.obj.Render();
+            foreach (BaseGLObject o in this.obj)
+            {
+                o.Render();
+            }
 
             this.SwapBuffers();
         }
@@ -115,24 +159,7 @@ namespace BlackJack
         {
             switch (e.Key)
             {
-                case Key.R:
-                    {
-                        // Move the object to a random location
-                        Random r = new Random();
-                        Vector3 newLocation = new Vector3(r.Next(-5, 5), r.Next(-5, 5), r.Next(-5, 5));
-                        this.obj.SetPosition(newLocation);
-                        break;
-                    }
-                case Key.Up:
-                    {
-                        this.obj.Scale(1.1f);
-                        break;
-                    }
-                case Key.Down:
-                    {
-                        this.obj.Scale(0.9f);
-                        break;
-                    }
+                
                 default: break;
             }
         }
