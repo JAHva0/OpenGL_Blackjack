@@ -93,6 +93,14 @@ namespace BlackJack
             this.CreateTexture(Program.CurrentDirectory + @"BlackJack\BlackJack\Textures\monkey paint.png");
         }
 
+        public int ShaderProgram
+        {
+            get
+            {
+                return this.shaderProgram;
+            }
+        }
+
         /// <summary>
         /// Rotate the object along the X axis.
         /// </summary>
@@ -143,8 +151,6 @@ namespace BlackJack
         /// </summary>
         public void Render()
         {
-            GL.UseProgram(this.shaderProgram);
-
             // Set the model matrix uniform
             Matrix4 modelMatrix = this.scale * this.rotation * this.location; // The order of the multiplication is important.
             GL.UniformMatrix4(this.uModelMatrix, false, ref modelMatrix);
@@ -155,7 +161,6 @@ namespace BlackJack
 
             // Reset 
             GL.BindVertexArray(0);
-            GL.UseProgram(0);
         }
 
         /// <summary>

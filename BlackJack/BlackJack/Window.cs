@@ -5,6 +5,7 @@ namespace BlackJack
     using System;
     using System.Collections.Generic;
     using System.Drawing;
+    using System.Linq;
     using OpenTK;
     using OpenTK.Graphics.OpenGL;
     using OpenTK.Input;
@@ -62,12 +63,12 @@ namespace BlackJack
 
             this.KeyDown += this.Window_KeyDown;
 
-            Camera.Initialize(this.Size, 0.1f, 100f, new Vector3(0.0f, 0.0f, 25.0f), Vector3.Zero);
+            Camera.Initialize(this.Size, 0.1f, 100f, new Vector3(35.0f, 0.0f, 35.0f), Vector3.Zero);
             Shaders.Load();
-            this.testLight = new Light("Main", new Vector3(10.0f, 0.0f, 0.0f), new Vector3(1.0f, 1.0f, 1.0f));
+            this.testLight = new Light("Main", new Vector3(10.0f, 0.0f, 0.0f), new Vector3(0.0f, 0.3f, 1.0f));
 
             float numMonkeys = 10f;
-            float monkeyStep = 2.5f;
+            float monkeyStep = 2f;
 
             for (float x = -numMonkeys; x <= numMonkeys; x += monkeyStep)
             {
@@ -142,9 +143,17 @@ namespace BlackJack
 
             GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
 
-            foreach (BaseGLObject o in this.obj)
+            foreach (int shaderProgram in Shaders.ProgramList.Values)
             {
-                o.Render();
+                var items = this.obj.Where(x => x.ShaderProgram == shaderProgram);
+                
+                GL.UseProgram(shaderProgram);
+                foreach (BaseGLObject o in items)
+                {
+                    o.Render();
+                }
+                GL.UseProgram(0);
+
             }
 
             this.SwapBuffers();
