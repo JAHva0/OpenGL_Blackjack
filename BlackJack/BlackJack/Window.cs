@@ -18,8 +18,7 @@ namespace BlackJack
         /// <summary>
         /// Testing object.
         /// </summary>
-        private List<BaseGLObject> obj = new List<BaseGLObject>();
-
+        private BaseGLObject obj;
         private Light testLight;
         private float lightAngle = 0;
         private float lightrotationSpeed = 0.05f;
@@ -63,30 +62,11 @@ namespace BlackJack
 
             this.KeyDown += this.Window_KeyDown;
 
-            Camera.Initialize(this.Size, 0.1f, 100f, new Vector3(35.0f, 0.0f, 35.0f), Vector3.Zero);
+            Camera.Initialize(this.Size, 0.1f, 100f, new Vector3(0.0f, 0.0f, 5.0f), Vector3.Zero);
             Shaders.Load();
-            this.testLight = new Light("Main", new Vector3(10.0f, 0.0f, 0.0f), new Vector3(0.0f, 0.3f, 1.0f));
+            this.testLight = new Light("Main", new Vector3(0.0f, 0.0f, 5.0f), new Vector3(0.0f, 0.3f, 1.0f));
 
-            float numMonkeys = 10f;
-            float monkeyStep = 2f;
-
-            for (float x = -numMonkeys; x <= numMonkeys; x += monkeyStep)
-            {
-                for (float y = -numMonkeys; y <= numMonkeys; y += monkeyStep)
-                {
-                    for (float z = -numMonkeys; z <= numMonkeys; z += monkeyStep)
-                    {
-                        BaseGLObject newobj = new BaseGLObject();
-                        Vector3 newLocation = new Vector3(x, y, z);
-                        Random r = new Random();
-                        newobj.RotateX(r.Next(0, 180));
-                        newobj.RotateY(r.Next(0, 180));
-                        newobj.RotateZ(r.Next(0, 180));
-                        newobj.SetPosition(newLocation);
-                        this.obj.Add(newobj);
-                    }
-                }
-            }
+            this.obj = new BaseGLObject();
         }
 
         /// <summary>
@@ -108,29 +88,6 @@ namespace BlackJack
         protected override void OnUpdateFrame(FrameEventArgs e)
         {
             base.OnUpdateFrame(e);
-
-            foreach (BaseGLObject o in this.obj)
-            {
-                o.RotateY(0.5f);
-            }
-
-            Light.LightsInScene["Main"].SetPosition(
-                new Vector3(
-                    (float)(5 * Math.Sin(this.lightAngle)), 
-                    0f, 
-                    (float)(5 * Math.Cos(this.lightAngle))));
-
-            this.lightAngle += this.lightrotationSpeed;
-            if (Math.Abs(this.lightAngle) > 2 * Math.PI)
-            {
-                Random r = new Random();
-                this.lightrotationSpeed = (float)r.Next(3, 10) / 100;
-                if (r.Next(0, 2) == 1)
-                {
-                    this.lightrotationSpeed = -this.lightrotationSpeed;
-                }
-                this.lightAngle = 0;
-            }
         }
 
         /// <summary>
@@ -143,18 +100,9 @@ namespace BlackJack
 
             GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
 
-            foreach (int shaderProgram in Shaders.ProgramList.Values)
-            {
-                var items = this.obj.Where(x => x.ShaderProgram == shaderProgram);
-                
-                GL.UseProgram(shaderProgram);
-                foreach (BaseGLObject o in items)
-                {
-                    o.Render();
-                }
-                GL.UseProgram(0);
-
-            }
+            GL.UseProgram(this.obj.ShaderProgram);
+            this.obj.Render();
+            GL.UseProgram(0);
 
             this.SwapBuffers();
         }
