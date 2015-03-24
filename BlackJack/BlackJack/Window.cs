@@ -70,7 +70,7 @@ namespace BlackJack
             this.testLight = new Light("Main", new Vector3(0.0f, 0.0f, 5.0f), new Vector3(0.0f, 0.3f, 1.0f));
 
             this.obj = new BaseGLObject();
-            this.textText = new Text("Hello World");
+            this.textText = new Text("Hello World", "Arial");
         }
 
         /// <summary>

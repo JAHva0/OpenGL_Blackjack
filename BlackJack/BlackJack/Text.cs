@@ -15,6 +15,8 @@ namespace BlackJack
     {
         /// <summary> The fonts which have been loaded so far. </summary>
         private static List<Font> loadedFonts = new List<Font>();
+
+        private Font font;
         
         /// <summary>
         /// Initializes a new instance of the <see cref="Text"/> class.
@@ -34,10 +36,24 @@ namespace BlackJack
         /// Initializes a new instance of the <see cref="Text"/> class.
         /// </summary>
         /// <param name="displaytext">The text to display.</param>
-        public Text(string displaytext)
+        public Text(string displaytext, string font)
             : this()
         {
-            Console.WriteLine("Starting");
+            // Make the provided font the one we will use
+            this.font = loadedFonts.Where(x => x.Name == font).SingleOrDefault();
+
+            // If we could not find a font with the given name in the loaded list, throw an error
+            if (this.font == null)
+            {
+                throw new Exception(string.Format("Font '{0}' not found.", font));
+            }
+
+            // Create a group of quads based on the letters in the displaytext string and their attributes in the Font.
+            foreach (char c in displaytext)
+            {
+                this.font.GetLetterCoordinates((int)c);
+
+            }
         }
 
         /// <summary> Gets a list of the loaded fonts. </summary>
@@ -105,6 +121,33 @@ namespace BlackJack
                         }
                     }
                 }
+            }
+
+            /// <summary> The name of this font. </summary>
+            /// <value> The name of the font. </value>
+            public string Name
+            {
+                get
+                {
+                    return this.name;
+                }
+            }
+
+            public Rectangle GetLetterCoordinates(int id)
+            {
+                Letter l = this.letterLookup[id];
+
+                int cellsPerRow = this.imageSize.Width / this.cellSize.Width;
+                int cellIndex = id - this.startingChar;
+
+                Point index = new Point((cellIndex % cellsPerRow) + 1, (cellIndex / cellsPerRow) + 1);
+
+                Rectangle coords = new Rectangle();
+                coords.Location = new Point(index.X * this.cellSize.Width, index.Y * this.cellSize.Height);
+                coords.Height = this.cellSize.Height;
+                coords.Width = l.BaseWidth;
+
+                return new Rectangle();
             }
 
             /// <summary>
