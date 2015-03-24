@@ -52,7 +52,6 @@ namespace BlackJack
             foreach (char c in displaytext)
             {
                 this.font.GetLetterCoordinates((int)c);
-
             }
         }
 
@@ -133,6 +132,11 @@ namespace BlackJack
                 }
             }
 
+            /// <summary>
+            /// Get the rectangle that represents the location of this letter on the texture.
+            /// </summary>
+            /// <param name="id">The ASCII code for the letter.</param>
+            /// <returns> A Rectangle with the location of the letter on the texture. </returns>
             public Rectangle GetLetterCoordinates(int id)
             {
                 Letter l = this.letterLookup[id];
@@ -147,7 +151,7 @@ namespace BlackJack
                 coords.Height = this.cellSize.Height;
                 coords.Width = l.BaseWidth;
 
-                return new Rectangle();
+                return coords;
             }
 
             /// <summary>

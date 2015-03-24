@@ -60,6 +60,8 @@
     <None Include="Models\Quad.obj" />
     <None Include="packages.config" />
     <None Include="Shaders\FragmentShader.glsl" />
+    <None Include="Shaders\TextFragmentShader.glsl" />
+    <None Include="Shaders\TextVertexShader.glsl" />
     <None Include="Shaders\VertexShader.glsl" />
   </ItemGroup>
   <ItemGroup>
