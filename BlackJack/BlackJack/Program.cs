@@ -9,9 +9,8 @@ namespace BlackJack
     /// </summary>
     public static class Program
     {
-        /// <summary>
-        /// Gets the path of the current directory, to allow relative paths to files.
-        /// </summary>
+        /// <summary> Gets the path of the current directory, to allow relative paths to files. </summary>
+        /// <value> The current working folder. </value>
         public static string CurrentDirectory
         {
             get

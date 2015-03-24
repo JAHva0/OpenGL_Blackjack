@@ -63,9 +63,8 @@ namespace BlackJack
             this.GenerateMeshData();
         }
 
-        /// <summary>
-        /// Gets a list of vertexes as gathered from the loaded model data.
-        /// </summary>
+        /// <summary> Gets a list of vertexes as gathered from the loaded model data. </summary>
+        /// <value> An array of Verticies. </value>
         public Vertex[] Verticies
         {
             get
@@ -74,9 +73,8 @@ namespace BlackJack
             }
         }
 
-        /// <summary>
-        /// Gets a list of indexes that represents the order of vertexes to draw.
-        /// </summary>
+        /// <summary> Gets a list of indexes that represents the order of vertexes to draw. </summary>
+        /// <value> An array of indexes for the element buffer. </value>
         public short[] Indicies
         {
             get
@@ -181,11 +179,13 @@ namespace BlackJack
                                             int.TryParse(subData.Split('/')[1], out texFace);
                                             int.TryParse(subData.Split('/')[2], out normFace);
                                             vertFace--;
+
                                             // There can be a case where the texture attribute is empty, in which case keep this 0.
                                             if (texFace > 0)
                                             {
                                                 texFace--;
                                             }
+
                                             normFace--;
                                             this.faceList.Add(new int[] { vertFace, texFace, normFace });
                                         }

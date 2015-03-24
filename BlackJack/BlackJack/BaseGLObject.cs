@@ -22,6 +22,7 @@ namespace BlackJack
         /// <summary> The handle for the index buffer data. </summary>
         private int indexBufferObject = -1;
 
+        /// <summary> The handle for the texture buffer. </summary>
         private int textureBufferObject = -1;
 
         /// <summary> The handle for the shader program used by this object. </summary>
@@ -93,6 +94,8 @@ namespace BlackJack
             this.CreateTexture(Program.CurrentDirectory + @"BlackJack\BlackJack\Textures\monkey paint.png");
         }
 
+        /// <summary> Gets the handle for the shader program used by this object. </summary>
+        /// <value>The shader program for this object.</value>
         public int ShaderProgram
         {
             get
