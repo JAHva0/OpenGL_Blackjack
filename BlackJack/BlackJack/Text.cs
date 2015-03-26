@@ -24,6 +24,8 @@ namespace BlackJack
         private int VertexBufferHandle = -1;
         private int IndexArrayHandle = -1;
 
+        private int IndexCount = 0;
+
         
         /// <summary>
         /// Initializes a new instance of the <see cref="Text"/> class.
@@ -60,6 +62,9 @@ namespace BlackJack
             List<short> indicies = new List<short>();
 
             // Create a group of quads based on the letters in the displaytext string and their attributes in the Font.
+
+            int charOffset = 0;
+            short indexOffset = 0;
             foreach (char c in displaytext)
             {
                 // Get the location of the letter in the texture, as well as the size for it's quad.
@@ -73,12 +78,23 @@ namespace BlackJack
                     );
 
                 // Save the four corners of the quad to our Vertex list.
-                verticies.Add(new Vertex(new Vector3(charRect.Width, 0, 0), new Vector2(charTextureCoords.Right, charTextureCoords.Y))); // Upper Right
-                verticies.Add(new Vertex(new Vector3(charRect.Width, -charRect.Height, 0), new Vector2(charTextureCoords.Right, charTextureCoords.Bottom))); // Lower Right
-                verticies.Add(new Vertex(new Vector3(0, -charRect.Height, 0), new Vector2(charTextureCoords.X, charTextureCoords.Bottom))); // Lower Left
-                verticies.Add(new Vertex(new Vector3(0, 0, 0), new Vector2(charTextureCoords.X, charTextureCoords.Y))); // Upper Right
+                verticies.Add(new Vertex(new Vector3(charRect.Width + charOffset, 0, 0), new Vector2(charTextureCoords.Right, charTextureCoords.Y))); // Upper Right
+                verticies.Add(new Vertex(new Vector3(charRect.Width + charOffset, -charRect.Height, 0), new Vector2(charTextureCoords.Right, charTextureCoords.Bottom))); // Lower Right
+                verticies.Add(new Vertex(new Vector3(0 + charOffset, -charRect.Height, 0), new Vector2(charTextureCoords.X, charTextureCoords.Bottom))); // Lower Left
+                verticies.Add(new Vertex(new Vector3(0 + charOffset, 0, 0), new Vector2(charTextureCoords.X, charTextureCoords.Y))); // Upper Right
 
-                indicies.AddRange(new List<short>() { 0, 1, 2, 0, 2, 3 });
+                indicies.AddRange(new List<short>() 
+                    { 
+                        (short)(0 + indexOffset), 
+                        (short)(2 + indexOffset), 
+                        (short)(1 + indexOffset), 
+                        (short)(0 + indexOffset), 
+                        (short)(3 + indexOffset), 
+                        (short)(2 + indexOffset) 
+                    });
+
+                charOffset += (int)charRect.Width;
+                indexOffset += 4;
             }
 
             Mesh model = new Mesh(verticies, indicies);
@@ -106,14 +122,15 @@ namespace BlackJack
             GL.BindVertexArray(0);
 
             base.CreateTexture(this.font.TextureFile);
-            
+
+            this.IndexCount = indicies.Count;
         }
 
         public void RenderText()
         {
             GL.UseProgram(this.ShaderProgram);
             GL.BindVertexArray(this.VertexArrayHandle);
-            GL.DrawElements(PrimitiveType.Triangles, 6, DrawElementsType.UnsignedShort, 0);
+            GL.DrawElements(PrimitiveType.Triangles, this.IndexCount, DrawElementsType.UnsignedShort, 0);
             GL.BindVertexArray(0);
             GL.UseProgram(0);
         }
