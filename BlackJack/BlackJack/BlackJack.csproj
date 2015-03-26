@@ -54,6 +54,7 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
+    <None Include="Font\FontData_Arial.csv" />
     <None Include="Models\Card.obj" />
     <None Include="Models\Cube_export.obj" />
     <None Include="Models\Monkey.obj" />
@@ -65,12 +66,11 @@
     <None Include="Shaders\VertexShader.glsl" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="Font\Font_Arial.bmp" />
     <Content Include="Textures\monkey paint.png" />
     <Content Include="Textures\SquareCounting.png" />
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Font\" />
-  </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="$(ProgramFiles)\MSBuild\StyleCop\v4.7\StyleCop.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

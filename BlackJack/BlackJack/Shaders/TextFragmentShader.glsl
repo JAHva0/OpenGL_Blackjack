@@ -8,5 +8,5 @@ uniform sampler2D textureSampler;
 
 void main()
 {
-	finalColor = texture2D(textureSampler, UV);
+	finalColor = texture2D(textureSampler, vec2(UV.x, UV.y));
 }

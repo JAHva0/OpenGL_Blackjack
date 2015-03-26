@@ -47,12 +47,12 @@ namespace BlackJack
         {
             base.OnLoad(e);
 
-            GL.ClearColor(Color.Black);
+            GL.ClearColor(Color.CornflowerBlue);
 
             // Tells OpenGL to cull faces that appear in the back, and that our front faces will be winding clockwise.
-            GL.Enable(EnableCap.CullFace);
-            GL.CullFace(CullFaceMode.Back);
-            GL.FrontFace(FrontFaceDirection.Ccw);
+            //GL.Enable(EnableCap.CullFace);
+            //GL.CullFace(CullFaceMode.Back);
+            //GL.FrontFace(FrontFaceDirection.Ccw);
 
             // Enable depth testing
             GL.Enable(EnableCap.DepthTest);
@@ -63,14 +63,18 @@ namespace BlackJack
             // Enable Textures
             GL.Enable(EnableCap.Texture2D);
 
+            
+
             this.KeyDown += this.Window_KeyDown;
 
-            Camera.Initialize(this.Size, 0.1f, 100f, new Vector3(0.0f, 0.0f, 5.0f), Vector3.Zero);
+            //Camera.Initialize(this.Size, 0.1f, 100f, new Vector3(0.0f, 0.0f, 5.0f), Vector3.Zero);
             Shaders.Load();
-            this.testLight = new Light("Main", new Vector3(0.0f, 0.0f, 5.0f), new Vector3(0.0f, 0.3f, 1.0f));
+            //this.testLight = new Light("Main", new Vector3(0.0f, 5.0f, 5.0f), new Vector3(1.0f, 0.1f, 0.0f));
 
-            this.obj = new BaseGLObject();
-            this.textText = new Text("Hello World", "Arial");
+            string modelFile = @"C:\Users\Jon\Documents\GitHub\OpenGL_Blackjack\BlackJack\BlackJack\Models\Monkey.obj";
+            string textureFile = @"C:\Users\Jon\Documents\GitHub\OpenGL_Blackjack\BlackJack\BlackJack\Textures\monkey paint.png";
+            //this.obj = new BaseGLObject(modelFile, textureFile, "Basic", "VertexShader", "FragmentShader");
+            this.textText = new Text("Y", "Arial");
         }
 
         /// <summary>
@@ -104,9 +108,11 @@ namespace BlackJack
 
             GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
 
-            GL.UseProgram(this.obj.ShaderProgram);
-            this.obj.Render();
-            GL.UseProgram(0);
+            //GL.UseProgram(this.obj.ShaderProgram);
+            //this.obj.Render();
+            //GL.UseProgram(0);
+
+            this.textText.RenderText();
 
             this.SwapBuffers();
         }

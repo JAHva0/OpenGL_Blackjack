@@ -7,24 +7,32 @@ namespace BlackJack
     using System.Drawing;
     using System.IO;
     using System.Linq;
+    using OpenTK;
+    using OpenTK.Graphics.OpenGL;
     
     /// <summary>
     /// Class for displaying text on the window.
     /// </summary>
-    public class Text
+    public class Text : BaseGLObject
     {
         /// <summary> The fonts which have been loaded so far. </summary>
         private static List<Font> loadedFonts = new List<Font>();
 
         private Font font;
+
+        private int VertexArrayHandle = -1;
+        private int VertexBufferHandle = -1;
+        private int IndexArrayHandle = -1;
+
         
         /// <summary>
         /// Initializes a new instance of the <see cref="Text"/> class.
         /// Referenced by other constructors to ensure that all fonts are loaded as soon as one is called for.
         /// </summary>
         public Text()
+            :base("Text", "TextVertexShader", "TextFragmentShader")
         { 
-            // If there are no fonts, load them
+            // If there are no fonts (i.e. this is the first text we've tried to create), load them
             if (loadedFonts.Count == 0)
             {
                 string fontFolder = Program.CurrentDirectory + @"BlackJack\BlackJack\Font\";
@@ -48,11 +56,66 @@ namespace BlackJack
                 throw new Exception(string.Format("Font '{0}' not found.", font));
             }
 
+            List<Vertex> verticies = new List<Vertex>();
+            List<short> indicies = new List<short>();
+
             // Create a group of quads based on the letters in the displaytext string and their attributes in the Font.
             foreach (char c in displaytext)
             {
-                this.font.GetLetterCoordinates((int)c);
+                // Get the location of the letter in the texture, as well as the size for it's quad.
+                RectangleF charRect = this.font.GetLetterCoordinates((int)c);
+
+                RectangleF charTextureCoords = new RectangleF(
+                    charRect.X / this.font.ImageSize.Width, 
+                    charRect.Y / this.font.ImageSize.Height, 
+                    charRect.Width / this.font.ImageSize.Width, 
+                    (charRect.Height / this.font.ImageSize.Height)
+                    );
+
+                // Save the four corners of the quad to our Vertex list.
+                verticies.Add(new Vertex(new Vector3(charRect.Width, 0, 0), new Vector2(charTextureCoords.Right, charTextureCoords.Y))); // Upper Right
+                verticies.Add(new Vertex(new Vector3(charRect.Width, charRect.Height, 0), new Vector2(charTextureCoords.Right, charTextureCoords.Bottom))); // Lower Right
+                verticies.Add(new Vertex(new Vector3(0, charRect.Height, 0), new Vector2(charTextureCoords.X, charTextureCoords.Bottom))); // Lower Left
+                verticies.Add(new Vertex(new Vector3(0, 0, 0), new Vector2(charTextureCoords.X, charTextureCoords.Y))); // Upper Right
+
+                indicies.AddRange(new List<short>() { 0, 1, 2, 0, 2, 3 });
             }
+
+            Mesh model = new Mesh(verticies, indicies);
+
+            GL.GenBuffers(1, out this.VertexBufferHandle);
+            GL.BindBuffer(BufferTarget.ArrayBuffer, this.VertexBufferHandle);
+            GL.BufferData(BufferTarget.ArrayBuffer, (IntPtr)(model.Verticies.Length * Vertex.SizeInBytes), model.Verticies, BufferUsageHint.StaticDraw);
+            GL.BindBuffer(BufferTarget.ArrayBuffer, 0);
+
+            GL.GenBuffers(1, out this.IndexArrayHandle);
+            GL.BindBuffer(BufferTarget.ElementArrayBuffer, this.IndexArrayHandle);
+            GL.BufferData(BufferTarget.ElementArrayBuffer, (IntPtr)(model.Indicies.Length * sizeof(short)), model.Indicies, BufferUsageHint.StaticDraw);
+            GL.BindBuffer(BufferTarget.ElementArrayBuffer, 0);
+
+            GL.GenVertexArrays(1, out this.VertexArrayHandle);
+            GL.BindVertexArray(this.VertexArrayHandle);
+
+            GL.BindBuffer(BufferTarget.ArrayBuffer, this.VertexBufferHandle);
+            GL.EnableVertexAttribArray(0);
+            GL.EnableVertexAttribArray(1);
+            GL.VertexAttribPointer(0, 3, VertexAttribPointerType.Float, false, Vertex.SizeInBytes, 0);
+            GL.VertexAttribPointer(1, 2, VertexAttribPointerType.Float, false, Vertex.SizeInBytes, Vertex.TextureOffset);
+            GL.BindBuffer(BufferTarget.ElementArrayBuffer, this.IndexArrayHandle);
+
+            GL.BindVertexArray(0);
+
+            base.CreateTexture(this.font.TextureFile);
+            
+        }
+
+        public void RenderText()
+        {
+            GL.UseProgram(this.ShaderProgram);
+            GL.BindVertexArray(this.VertexArrayHandle);
+            GL.DrawElements(PrimitiveType.Triangles, 6, DrawElementsType.UnsignedShort, 0);
+            GL.BindVertexArray(0);
+            GL.UseProgram(0);
         }
 
         /// <summary> Gets a list of the loaded fonts. </summary>
@@ -71,7 +134,7 @@ namespace BlackJack
         public class Font
         {
             /// <summary> The size of the image texture. </summary>
-            private Size imageSize;
+            private SizeF imageSize;
 
             /// <summary> The size of an individual cell on the texture. </summary>
             private Size cellSize;
@@ -84,6 +147,8 @@ namespace BlackJack
 
             /// <summary> A dictionary that allows reference to the loaded letter information. </summary>
             private Dictionary<int, Letter> letterLookup = new Dictionary<int, Letter>();
+
+            private string textureFile;
             
             /// <summary>
             /// Initializes a new instance of the <see cref="Font"/> class.
@@ -107,6 +172,8 @@ namespace BlackJack
                 {
                     this.letterLookup.Add(i, new Letter(i));
                 }
+
+                this.textureFile = texture;
 
                 // Read the Data file and store the relevant data
                 string line;
@@ -132,6 +199,22 @@ namespace BlackJack
                 }
             }
 
+            public SizeF ImageSize
+            {
+                get
+                {
+                    return this.imageSize;
+                }
+            }
+
+            public string TextureFile
+            {
+                get
+                {
+                    return this.textureFile;
+                }
+            }
+
             /// <summary>
             /// Get the rectangle that represents the location of this letter on the texture.
             /// </summary>
@@ -141,10 +224,10 @@ namespace BlackJack
             {
                 Letter l = this.letterLookup[id];
 
-                int cellsPerRow = this.imageSize.Width / this.cellSize.Width;
+                int cellsPerRow = (int)(this.imageSize.Width / this.cellSize.Width);
                 int cellIndex = id - this.startingChar;
 
-                Point index = new Point((cellIndex % cellsPerRow) + 1, (cellIndex / cellsPerRow) + 1);
+                Point index = new Point((cellIndex % cellsPerRow), (cellIndex / cellsPerRow));
 
                 Rectangle coords = new Rectangle();
                 coords.Location = new Point(index.X * this.cellSize.Width, index.Y * this.cellSize.Height);
@@ -152,6 +235,11 @@ namespace BlackJack
                 coords.Width = l.BaseWidth;
 
                 return coords;
+            }
+
+            public override string ToString()
+            {
+                return this.name + ": " + this.imageSize.ToString();
             }
 
             /// <summary>
