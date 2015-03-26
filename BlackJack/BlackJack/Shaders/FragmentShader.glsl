@@ -8,7 +8,7 @@ in vec3 LightDirection_cameraspace;
 
 uniform sampler2D textureSampler;
 
-out vec3 finalColor;
+out vec4 finalColor;
 
 layout(std140) uniform Light
 {
@@ -50,11 +50,11 @@ void main()
 	// - Looking elsewhere -> <1
 	float CosAlpha = clamp(dot(E, R), 0, 1);
 
-	finalColor = 
+	finalColor = vec4((
 		// Ambient: simulates indirect lighting
 		MaterialAmbientColor +
 		// Diffuse: the "color" of the fragment
 		MaterialDiffuseColor * lightColor * lightPower * cosTheta / (distance*distance) +
 		// Specular: reflective highlight
-		MaterialSpecularColor * lightColor * lightPower * pow(CosAlpha, 5) / (distance*distance);
+		MaterialSpecularColor * lightColor * lightPower * pow(CosAlpha, 5) / (distance*distance)), 1.0f);
 }
