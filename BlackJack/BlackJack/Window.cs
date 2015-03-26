@@ -115,7 +115,9 @@ namespace BlackJack
             //this.obj.Render();
             //GL.UseProgram(0);
 
-            this.textText.RenderText();
+            GL.UseProgram(this.textText.ShaderProgram);
+            this.textText.Render();
+            GL.UseProgram(0);
 
             this.SwapBuffers();
         }

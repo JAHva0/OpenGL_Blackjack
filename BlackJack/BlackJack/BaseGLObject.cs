@@ -75,8 +75,6 @@ namespace BlackJack
             // Load the basic box model
             Mesh model = new Mesh(modelFile);
 
-            this.indexCount = model.Indicies.Length;
-
             // Get the Block index for the camera.
             this.globalCameraMatrix = GL.GetUniformBlockIndex(this.shaderProgram, "GlobalCamera");
 
@@ -158,9 +156,12 @@ namespace BlackJack
         /// </summary>
         public void Render()
         {
-            // Set the model matrix uniform
-            Matrix4 modelMatrix = this.scale * this.rotation * this.location; // The order of the multiplication is important.
-            GL.UniformMatrix4(this.uModelMatrix, false, ref modelMatrix);
+            // Set the model matrix uniform, if we need to. (2D objects have no need)
+            if (this.uModelMatrix != -1)
+            {
+                Matrix4 modelMatrix = this.scale * this.rotation * this.location; // The order of the multiplication is important.
+                GL.UniformMatrix4(this.uModelMatrix, false, ref modelMatrix);
+            }
 
             // Draw the object
             GL.BindVertexArray(this.vertexArrayObject);
@@ -187,6 +188,9 @@ namespace BlackJack
             GL.BindBuffer(BufferTarget.ElementArrayBuffer, this.indexBufferObject);
             GL.BufferData(BufferTarget.ElementArrayBuffer, (IntPtr)(model.Indicies.Length * sizeof(short)), model.Indicies, BufferUsageHint.StaticDraw);
             GL.BindBuffer(BufferTarget.ElementArrayBuffer, 0);
+
+            // Save the number of indicies for the render function.
+            this.indexCount = model.Indicies.Length;
         }
 
         /// <summary>

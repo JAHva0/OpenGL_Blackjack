@@ -99,27 +99,9 @@ namespace BlackJack
 
             Mesh model = new Mesh(verticies, indicies);
 
-            GL.GenBuffers(1, out this.VertexBufferHandle);
-            GL.BindBuffer(BufferTarget.ArrayBuffer, this.VertexBufferHandle);
-            GL.BufferData(BufferTarget.ArrayBuffer, (IntPtr)(model.Verticies.Length * Vertex.SizeInBytes), model.Verticies, BufferUsageHint.StaticDraw);
-            GL.BindBuffer(BufferTarget.ArrayBuffer, 0);
+            base.InitializeBufferObjects(model);
 
-            GL.GenBuffers(1, out this.IndexArrayHandle);
-            GL.BindBuffer(BufferTarget.ElementArrayBuffer, this.IndexArrayHandle);
-            GL.BufferData(BufferTarget.ElementArrayBuffer, (IntPtr)(model.Indicies.Length * sizeof(short)), model.Indicies, BufferUsageHint.StaticDraw);
-            GL.BindBuffer(BufferTarget.ElementArrayBuffer, 0);
-
-            GL.GenVertexArrays(1, out this.VertexArrayHandle);
-            GL.BindVertexArray(this.VertexArrayHandle);
-
-            GL.BindBuffer(BufferTarget.ArrayBuffer, this.VertexBufferHandle);
-            GL.EnableVertexAttribArray(0);
-            GL.EnableVertexAttribArray(1);
-            GL.VertexAttribPointer(0, 3, VertexAttribPointerType.Float, false, Vertex.SizeInBytes, 0);
-            GL.VertexAttribPointer(1, 2, VertexAttribPointerType.Float, false, Vertex.SizeInBytes, Vertex.TextureOffset);
-            GL.BindBuffer(BufferTarget.ElementArrayBuffer, this.IndexArrayHandle);
-
-            GL.BindVertexArray(0);
+            base.InitialzeVertexObject();
 
             base.CreateTexture(this.font.TextureFile);
 
