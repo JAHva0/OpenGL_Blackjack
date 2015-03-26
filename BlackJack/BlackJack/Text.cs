@@ -59,6 +59,21 @@ namespace BlackJack
                 throw new Exception(string.Format("Font '{0}' not found.", font));
             }
 
+            Mesh model = this.CreateTextMesh(displaytext);
+
+            base.InitializeBufferObjects(model);
+
+            base.InitialzeVertexObject();
+
+            // Locate the uniforms
+            this.uColor = GL.GetUniformLocation(this.ShaderProgram, "textColor");
+            this.uLocation = GL.GetUniformLocation(this.ShaderProgram, "textOffset");
+
+            base.CreateTexture(this.font.TextureFile);
+        }
+
+        private Mesh CreateTextMesh(string text)
+        {
             List<Vertex> verticies = new List<Vertex>();
             List<short> indicies = new List<short>();
 
@@ -66,15 +81,15 @@ namespace BlackJack
 
             int charOffset = 0;
             short indexOffset = 0;
-            foreach (char c in displaytext)
+            foreach (char c in text)
             {
                 // Get the location of the letter in the texture, as well as the size for it's quad.
                 RectangleF charRect = this.font.GetLetterCoordinates((int)c);
 
                 RectangleF charTextureCoords = new RectangleF(
-                    charRect.X / this.font.ImageSize.Width, 
-                    charRect.Y / this.font.ImageSize.Height, 
-                    charRect.Width / this.font.ImageSize.Width, 
+                    charRect.X / this.font.ImageSize.Width,
+                    charRect.Y / this.font.ImageSize.Height,
+                    charRect.Width / this.font.ImageSize.Width,
                     (charRect.Height / this.font.ImageSize.Height)
                     );
 
@@ -98,17 +113,7 @@ namespace BlackJack
                 indexOffset += 4;
             }
 
-            Mesh model = new Mesh(verticies, indicies);
-
-            base.InitializeBufferObjects(model);
-
-            base.InitialzeVertexObject();
-
-            // Locate the uniforms
-            this.uColor = GL.GetUniformLocation(this.ShaderProgram, "textColor");
-            this.uLocation = GL.GetUniformLocation(this.ShaderProgram, "textOffset");
-
-            base.CreateTexture(this.font.TextureFile);
+            return new Mesh(verticies, indicies);
         }
 
         public void SetPosition(Vector2 position)
