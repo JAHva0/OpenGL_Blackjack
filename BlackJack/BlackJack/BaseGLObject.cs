@@ -63,6 +63,15 @@ namespace BlackJack
 
             // Store the program handle.
             this.shaderProgram = Shaders.ProgramList[shaderProgramName];
+
+            // Get the Block index for the camera.
+            this.globalCameraMatrix = GL.GetUniformBlockIndex(this.shaderProgram, "GlobalCamera");
+
+            // Get the Block index for the light
+            this.globalLight = GL.GetUniformBlockIndex(this.shaderProgram, "Light");
+
+            // Get the location of the model matrix uniform.
+            this.uModelMatrix = GL.GetUniformLocation(this.shaderProgram, "modelMatrix");
         }
 
         /// <summary>
@@ -74,15 +83,6 @@ namespace BlackJack
         {
             // Load the basic box model
             Mesh model = new Mesh(modelFile);
-
-            // Get the Block index for the camera.
-            this.globalCameraMatrix = GL.GetUniformBlockIndex(this.shaderProgram, "GlobalCamera");
-
-            // Get the Block index for the light
-            this.globalLight = GL.GetUniformBlockIndex(this.shaderProgram, "Light");
-
-            // Get the location of the model matrix uniform.
-            this.uModelMatrix = GL.GetUniformLocation(this.shaderProgram, "modelMatrix");
 
             GL.UseProgram(this.shaderProgram);
             GL.UniformBlockBinding(this.shaderProgram, this.globalCameraMatrix, Camera.GlobalUBO);
@@ -154,7 +154,7 @@ namespace BlackJack
         /// <summary>
         /// Render the object.
         /// </summary>
-        public void Render()
+        public virtual void Render()
         {
             // Set the model matrix uniform, if we need to. (2D objects have no need)
             if (this.uModelMatrix != -1)
