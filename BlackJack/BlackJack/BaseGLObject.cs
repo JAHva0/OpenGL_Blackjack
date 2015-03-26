@@ -91,9 +91,9 @@ namespace BlackJack
 
             this.InitializeBufferObjects(model);
 
-            this.InitialzeVertexObject();
-
             this.CreateTexture(textureFile);
+
+            this.InitialzeVertexObject();
         }
 
         /// <summary> Gets the handle for the shader program used by this object. </summary>
@@ -163,6 +163,9 @@ namespace BlackJack
                 GL.UniformMatrix4(this.uModelMatrix, false, ref modelMatrix);
             }
 
+            // Assign the proper texture for the buffer
+            GL.BindTexture(TextureTarget.Texture2D, this.textureBufferObject);
+
             // Draw the object
             GL.BindVertexArray(this.vertexArrayObject);
             GL.DrawElements(PrimitiveType.Triangles, this.indexCount, DrawElementsType.UnsignedShort, 0);
@@ -202,6 +205,8 @@ namespace BlackJack
             GL.GenVertexArrays(1, out this.vertexArrayObject);
             GL.BindVertexArray(this.vertexArrayObject);
 
+            GL.BindTexture(TextureTarget.Texture2D, this.textureBufferObject);
+
             GL.BindBuffer(BufferTarget.ArrayBuffer, this.vertexBufferObject);
 
             GL.EnableVertexAttribArray(0);
@@ -212,6 +217,8 @@ namespace BlackJack
             GL.VertexAttribPointer(2, 3, VertexAttribPointerType.Float, false, Vertex.SizeInBytes, Vertex.NormalOffset);
 
             GL.BindBuffer(BufferTarget.ElementArrayBuffer, this.indexBufferObject);
+
+            
 
             GL.BindVertexArray(0);
         }
