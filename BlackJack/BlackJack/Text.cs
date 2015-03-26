@@ -72,6 +72,15 @@ namespace BlackJack
             base.CreateTexture(this.font.TextureFile);
         }
 
+        public void SetText(string text)
+        {
+            // Create a new model from the text provided.
+            Mesh model = this.CreateTextMesh(text);
+
+            // Update the buffer object with our new information.
+            base.UpdateBufferObjects(model);
+        }
+
         private Mesh CreateTextMesh(string text)
         {
             List<Vertex> verticies = new List<Vertex>();

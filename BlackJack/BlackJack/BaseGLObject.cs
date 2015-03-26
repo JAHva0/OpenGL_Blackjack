@@ -196,6 +196,19 @@ namespace BlackJack
             this.indexCount = model.Indicies.Length;
         }
 
+        internal void UpdateBufferObjects(Mesh model)
+        {
+            GL.BindBuffer(BufferTarget.ArrayBuffer, this.vertexBufferObject);
+            GL.BufferData(BufferTarget.ArrayBuffer, (IntPtr)(model.Verticies.Length * (int)Vertex.SizeInBytes), model.Verticies, BufferUsageHint.StaticDraw);
+            GL.BindBuffer(BufferTarget.ArrayBuffer, 0);
+
+            GL.BindBuffer(BufferTarget.ElementArrayBuffer, this.indexBufferObject);
+            GL.BufferData(BufferTarget.ElementArrayBuffer, (IntPtr)(model.Indicies.Length * sizeof(short)), model.Indicies, BufferUsageHint.StaticDraw);
+            GL.BindBuffer(BufferTarget.ElementArrayBuffer, 0);
+
+            this.indexCount = model.Indicies.Length;
+        }
+
         /// <summary>
         /// Initializes the Vertex Array for this object.
         /// </summary>
