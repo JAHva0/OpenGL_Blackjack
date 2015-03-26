@@ -74,7 +74,7 @@ namespace BlackJack
             string modelFile = @"C:\Users\Jon\Documents\GitHub\OpenGL_Blackjack\BlackJack\BlackJack\Models\Monkey.obj";
             string textureFile = @"C:\Users\Jon\Documents\GitHub\OpenGL_Blackjack\BlackJack\BlackJack\Textures\monkey paint.png";
             //this.obj = new BaseGLObject(modelFile, textureFile, "Basic", "VertexShader", "FragmentShader");
-            this.textText = new Text("Y", "Arial");
+            this.textText = new Text("YR", "Arial");
         }
 
         /// <summary>

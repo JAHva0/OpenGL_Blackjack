@@ -74,8 +74,8 @@ namespace BlackJack
 
                 // Save the four corners of the quad to our Vertex list.
                 verticies.Add(new Vertex(new Vector3(charRect.Width, 0, 0), new Vector2(charTextureCoords.Right, charTextureCoords.Y))); // Upper Right
-                verticies.Add(new Vertex(new Vector3(charRect.Width, charRect.Height, 0), new Vector2(charTextureCoords.Right, charTextureCoords.Bottom))); // Lower Right
-                verticies.Add(new Vertex(new Vector3(0, charRect.Height, 0), new Vector2(charTextureCoords.X, charTextureCoords.Bottom))); // Lower Left
+                verticies.Add(new Vertex(new Vector3(charRect.Width, -charRect.Height, 0), new Vector2(charTextureCoords.Right, charTextureCoords.Bottom))); // Lower Right
+                verticies.Add(new Vertex(new Vector3(0, -charRect.Height, 0), new Vector2(charTextureCoords.X, charTextureCoords.Bottom))); // Lower Left
                 verticies.Add(new Vertex(new Vector3(0, 0, 0), new Vector2(charTextureCoords.X, charTextureCoords.Y))); // Upper Right
 
                 indicies.AddRange(new List<short>() { 0, 1, 2, 0, 2, 3 });
