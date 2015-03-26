@@ -16,6 +16,7 @@ namespace BlackJack
             get
             {
                 return Directory.GetCurrentDirectory().Substring(0, Directory.GetCurrentDirectory().IndexOf("BlackJack"));
+                //return @"C:\Users\Jon\Documents\GitHub\OpenGL_Blackjack\";
             }
         }
 
