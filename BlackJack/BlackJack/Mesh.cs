@@ -33,6 +33,17 @@ namespace BlackJack
         /// <summary>
         /// Initializes a new instance of the <see cref="Mesh"/> class.
         /// </summary>
+        /// <param name="verticies">A list of verticies to process.</param>
+        /// <param name="textures">A list of texture cordinates to process.</param>
+        public Mesh(List<Vertex> verticies, List<short> indicies)
+        {
+            this.verticies = verticies;
+            this.indicies = indicies;
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="Mesh"/> class.
+        /// </summary>
         /// <param name="filename">The file to load.</param>
         public Mesh(string filename)
         {
