@@ -50,9 +50,9 @@ namespace BlackJack
             GL.ClearColor(Color.CornflowerBlue);
 
             // Tells OpenGL to cull faces that appear in the back, and that our front faces will be winding clockwise.
-            //GL.Enable(EnableCap.CullFace);
-            //GL.CullFace(CullFaceMode.Back);
-            //GL.FrontFace(FrontFaceDirection.Ccw);
+            GL.Enable(EnableCap.CullFace);
+            GL.CullFace(CullFaceMode.Back);
+            GL.FrontFace(FrontFaceDirection.Ccw);
 
             // Enable depth testing
             GL.Enable(EnableCap.DepthTest);
@@ -60,9 +60,12 @@ namespace BlackJack
             GL.DepthFunc(DepthFunction.Lequal);
             GL.DepthRange(0.0f, 1.0f);
 
-            // Enable Textures
-            GL.Enable(EnableCap.Texture2D);
+            // Enable Textures - Does this do anything?
+            //GL.Enable(EnableCap.Texture2D);
 
+            // Enable Alpha and Blending
+            GL.Enable(EnableCap.Blend);
+            GL.BlendFunc(BlendingFactorSrc.SrcAlpha, BlendingFactorDest.OneMinusSrcAlpha);
             
 
             this.KeyDown += this.Window_KeyDown;
@@ -74,7 +77,7 @@ namespace BlackJack
             string modelFile = @"C:\Users\Jon\Documents\GitHub\OpenGL_Blackjack\BlackJack\BlackJack\Models\Monkey.obj";
             string textureFile = @"C:\Users\Jon\Documents\GitHub\OpenGL_Blackjack\BlackJack\BlackJack\Textures\monkey paint.png";
             //this.obj = new BaseGLObject(modelFile, textureFile, "Basic", "VertexShader", "FragmentShader");
-            this.textText = new Text("YR", "Arial");
+            this.textText = new Text("Hello World!", "Arial");
         }
 
         /// <summary>
