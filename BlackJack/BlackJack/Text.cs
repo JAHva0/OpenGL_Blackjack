@@ -20,12 +20,13 @@ namespace BlackJack
 
         private Font font;
 
-        private int VertexArrayHandle = -1;
-        private int VertexBufferHandle = -1;
-        private int IndexArrayHandle = -1;
+        private int uColor = -1;
 
-        private int IndexCount = 0;
+        private int uLocation = -1;
 
+        private Vector3 color = new Vector3(0.0f, 1.0f, 0.0f);
+
+        private Vector2 location = new Vector2(0.0f, 0.0f);
         
         /// <summary>
         /// Initializes a new instance of the <see cref="Text"/> class.
@@ -103,18 +104,25 @@ namespace BlackJack
 
             base.InitialzeVertexObject();
 
-            base.CreateTexture(this.font.TextureFile);
+            // Locate the uniforms
+            this.uColor = GL.GetUniformLocation(this.ShaderProgram, "textColor");
+            this.uLocation = GL.GetUniformLocation(this.ShaderProgram, "textOffset");
 
-            this.IndexCount = indicies.Count;
+            base.CreateTexture(this.font.TextureFile);
         }
 
-        public void RenderText()
+        public void SetPosition(Vector2 position)
         {
-            GL.UseProgram(this.ShaderProgram);
-            GL.BindVertexArray(this.VertexArrayHandle);
-            GL.DrawElements(PrimitiveType.Triangles, this.IndexCount, DrawElementsType.UnsignedShort, 0);
-            GL.BindVertexArray(0);
-            GL.UseProgram(0);
+            this.location = position;
+        }
+
+        public override void Render()
+        {
+ 	        // Update Text Specific Uniforms 
+            GL.Uniform3(this.uColor, ref this.color);
+            GL.Uniform2(this.uLocation, ref this.location);
+
+            base.Render();
         }
 
         /// <summary> Gets a list of the loaded fonts. </summary>
