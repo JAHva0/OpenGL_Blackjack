@@ -52,26 +52,30 @@ namespace BlackJack
 
         /// <summary> The value to pass to the scale uniform. </summary>
         private Matrix4 scale = Matrix4.Identity;
-        
+
+        public BaseGLObject(string shaderProgramName, string VertShader, string FragShader)
+        {
+            // If no shader program called Basic exists, create one
+            if (!Shaders.ProgramList.ContainsKey(shaderProgramName))
+            {
+                Shaders.CreateNewProgram(shaderProgramName, Shaders.ShaderList[VertShader], Shaders.ShaderList[FragShader]);
+            }
+
+            // Store the program handle.
+            this.shaderProgram = Shaders.ProgramList[shaderProgramName];
+        }
+
         /// <summary>
         /// Initializes a new instance of the <see cref="BaseGLObject"/> class. 
         /// The blank constructor just creates a basic card for testing.
         /// </summary>
-        public BaseGLObject()
+        public BaseGLObject(string modelFile, string textureFile, string shaderProgramName, string VertShader, string FragShader)
+            : this(shaderProgramName, VertShader, FragShader)
         {
             // Load the basic box model
-            Mesh model = new Mesh(Program.CurrentDirectory + @"BlackJack\BlackJack\Models\Monkey.obj");
+            Mesh model = new Mesh(modelFile);
 
             this.indexCount = model.Indicies.Length;
-
-            // If no shader program called Basic exists, create one
-            if (!Shaders.ProgramList.ContainsKey("Basic"))
-            {
-                Shaders.CreateNewProgram("Basic", Shaders.ShaderList["VertexShader"], Shaders.ShaderList["FragmentShader"]);
-            }
-
-            // Store the program handle.
-            this.shaderProgram = Shaders.ProgramList["Basic"];
 
             // Get the Block index for the camera.
             this.globalCameraMatrix = GL.GetUniformBlockIndex(this.shaderProgram, "GlobalCamera");
@@ -91,7 +95,7 @@ namespace BlackJack
 
             this.InitialzeVertexObject();
 
-            this.CreateTexture(Program.CurrentDirectory + @"BlackJack\BlackJack\Textures\monkey paint.png");
+            this.CreateTexture(textureFile);
         }
 
         /// <summary> Gets the handle for the shader program used by this object. </summary>
@@ -170,7 +174,7 @@ namespace BlackJack
         /// Initialize the Vertex and Index Buffers for this object.
         /// </summary>
         /// <param name="model">The model information for the object.</param>
-        private void InitializeBufferObjects(Mesh model)
+        internal void InitializeBufferObjects(Mesh model)
         {
             // Create the vertex buffer
             GL.GenBuffers(1, out this.vertexBufferObject);
@@ -181,14 +185,14 @@ namespace BlackJack
             // Create the index Buffer
             GL.GenBuffers(1, out this.indexBufferObject);
             GL.BindBuffer(BufferTarget.ElementArrayBuffer, this.indexBufferObject);
-            GL.BufferData(BufferTarget.ElementArrayBuffer, (IntPtr)(this.indexCount * sizeof(short)), model.Indicies, BufferUsageHint.StaticDraw);
+            GL.BufferData(BufferTarget.ElementArrayBuffer, (IntPtr)(model.Indicies.Length * sizeof(short)), model.Indicies, BufferUsageHint.StaticDraw);
             GL.BindBuffer(BufferTarget.ElementArrayBuffer, 0);
         }
 
         /// <summary>
         /// Initializes the Vertex Array for this object.
         /// </summary>
-        private void InitialzeVertexObject()
+        internal void InitialzeVertexObject()
         {
             // Create the Vertex Array Buffer and initialize it.
             GL.GenVertexArrays(1, out this.vertexArrayObject);
@@ -212,7 +216,7 @@ namespace BlackJack
         /// Loads a texture from a file.
         /// </summary>
         /// <param name="textureFile">The file to load.</param>
-        private void CreateTexture(string textureFile)
+        internal void CreateTexture(string textureFile)
         {
             if (!System.IO.File.Exists(textureFile))
             {
