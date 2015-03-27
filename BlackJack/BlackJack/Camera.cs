@@ -12,6 +12,8 @@ namespace BlackJack
     /// </summary>
     public static class Camera
     {
+        private static Size windowSize;
+        
         /// <summary> The three dimensional coordinates of the camera's eye. </summary>
         private static Vector3 cameraeyelocation;
 
@@ -49,6 +51,7 @@ namespace BlackJack
         {
             cameraeyelocation = location;
             cameraeyetarget = target;
+            windowSize = window;
 
             matricies.Perspective = Matrix4.CreatePerspectiveFieldOfView(MathHelper.PiOver4, (float)window.Width / (float)window.Height, z_Near, z_Far);
             matricies.View = Matrix4.LookAt(location, target, new Vector3(0.0f, 1.0f, 0.0f));
@@ -92,6 +95,37 @@ namespace BlackJack
             GL.BindBuffer(BufferTarget.UniformBuffer, globalCameraUBO);
             GL.BufferSubData(BufferTarget.UniformBuffer, IntPtr.Zero, GlobalMatrix.SizeInBytes, ref matricies);
             GL.BindBuffer(BufferTarget.UniformBuffer, 0);
+        }
+
+        /// <summary>
+        /// Gets a raycast from the provided screen coordinates of the mouse.
+        /// </summary>
+        /// <param name="mousePosition">The Location of the mouse on the window.</param>
+        /// <returns>A raycast from the mouse position through the scene. </returns>
+        public static Vector4 GetRaycast(Vector2 mousePosition)
+        {
+            // Create a vector from the mouse's position
+            Vector4 vec = new Vector4();
+
+            vec.X = 2.0f * mousePosition.X / (float)windowSize.Width - 1;
+            vec.Y = -(2.0f * mousePosition.Y / (float)windowSize.Height - 1);
+            vec.Z = 0f;
+            vec.W = 1.0f;
+
+            Matrix4 viewInverse = Matrix4.Invert(matricies.View);
+            Matrix4 projInverse = Matrix4.Invert(matricies.Perspective);
+
+            Vector4.Transform(ref vec, ref projInverse, out vec);
+            Vector4.Transform(ref vec, ref viewInverse, out vec);
+
+            if (vec.W > float.Epsilon || vec.W < float.Epsilon)
+            {
+                vec.X /= vec.W;
+                vec.Y /= vec.W;
+                vec.Z /= vec.W;
+            }
+
+            return vec;
         }
 
         /// <summary>

@@ -23,13 +23,10 @@ namespace BlackJack
         /// <summary>
         /// Testing object.
         /// </summary>
-        private List<BaseGLObject> objs = new List<BaseGLObject>();
+        private BaseGLObject obj;
 
         /// <summary> A Generic Light. </summary>
         private Light testLight;
-        private float lightAngle = 0;
-        private float lightrotationSpeed = 0.05f;
-
 
         /// <summary> A text object. </summary>
         private Text textText;
@@ -47,8 +44,14 @@ namespace BlackJack
             this.ClientSize = windowDimensions;
 
             this.KeyDown += this.Window_KeyDown;
+            this.MouseDown += Window_MouseDown;
 
             FPSUpdate.Elapsed += new ElapsedEventHandler(UpdateFPSCount);
+        }
+
+        void Window_MouseDown(object sender, MouseButtonEventArgs e)
+        {
+            Console.WriteLine(Camera.GetRaycast(new Vector2(e.X, e.Y)));
         }
 
         private void UpdateFPSCount(object source, ElapsedEventArgs e)
@@ -86,34 +89,14 @@ namespace BlackJack
             GL.Enable(EnableCap.Blend);
             GL.BlendFunc(BlendingFactorSrc.SrcAlpha, BlendingFactorDest.OneMinusSrcAlpha);
 
-            Camera.Initialize(this.Size, 0.1f, 100f, new Vector3(25.0f, 25.0f, 25.0f), Vector3.Zero);
+            Camera.Initialize(this.Size, 0.1f, 100f, new Vector3(0.0f, 0.0f, 5.0f), Vector3.Zero);
             Shaders.Load();
             this.testLight = new Light("Main", new Vector3(0.0f, 5.0f, 5.0f), new Vector3(1.0f, 1.0f, 1.0f));
 
             string modelFile = @"C:\Users\Jon\Documents\GitHub\OpenGL_Blackjack\BlackJack\BlackJack\Models\Monkey.obj";
             string textureFile = @"C:\Users\Jon\Documents\GitHub\OpenGL_Blackjack\BlackJack\BlackJack\Textures\monkey paint.png";
 
-            float numMonkeys = 10f;
-            float monkeyStep = 2.5f;
-
-            for (float x = -numMonkeys; x <= numMonkeys; x += monkeyStep)
-            {
-                for (float y = -numMonkeys; y <= numMonkeys; y += monkeyStep)
-                {
-                    for (float z = -numMonkeys; z <= numMonkeys; z += monkeyStep)
-                    {
-                        BaseGLObject newobj = new BaseGLObject(modelFile, textureFile, "Basic", "VertexShader", "FragmentShader");
-                        Vector3 newLocation = new Vector3(x, y, z);
-                        Random r = new Random();
-                        newobj.RotateX(r.Next(0, 180));
-                        newobj.RotateY(r.Next(0, 180));
-                        newobj.RotateZ(r.Next(0, 180));
-                        newobj.SetPosition(newLocation);
-                        this.objs.Add(newobj);
-                    }
-                }
-            }
-
+            obj = new BaseGLObject(modelFile, textureFile, "Basic", "VertexShader", "FragmentShader");
 
             this.textText = new Text("0 FPS", "Arial");
             this.textText.SetPosition(new Vector2(-750, 400));
@@ -146,28 +129,7 @@ namespace BlackJack
                 this.updateFPSText = false;
             }
 
-            foreach (BaseGLObject o in this.objs)
-            {
-                o.RotateY(0.5f);
-            }
-
-            Light.LightsInScene["Main"].SetPosition(
-                new Vector3(
-                    (float)(5 * Math.Sin(this.lightAngle)),
-                    0f,
-                    (float)(5 * Math.Cos(this.lightAngle))));
-
-            this.lightAngle += this.lightrotationSpeed;
-            if (Math.Abs(this.lightAngle) > 2 * Math.PI)
-            {
-                Random r = new Random();
-                this.lightrotationSpeed = (float)r.Next(3, 10) / 100;
-                if (r.Next(0, 2) == 1)
-                {
-                    this.lightrotationSpeed = -this.lightrotationSpeed;
-                }
-                this.lightAngle = 0;
-            }
+            //this.obj.RotateY(0.5f);
         }
 
         /// <summary>
@@ -181,17 +143,9 @@ namespace BlackJack
 
             GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
 
-            foreach (int shaderProgram in Shaders.ProgramList.Values)
-            {
-                var items = this.objs.Where(x => x.ShaderProgram == shaderProgram);
-
-                GL.UseProgram(shaderProgram);
-                foreach (BaseGLObject o in items)
-                {
-                    o.Render();
-                }
-                GL.UseProgram(0);
-            }
+            GL.UseProgram(this.obj.ShaderProgram);
+            this.obj.Render();
+            GL.UseProgram(0);
 
             GL.UseProgram(this.textText.ShaderProgram);
             this.textText.Render();
