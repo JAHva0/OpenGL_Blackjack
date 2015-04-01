@@ -94,6 +94,27 @@ namespace BlackJack
             }
         }
 
+        public List<int> VertexFaceList
+        {
+            get
+            {
+                List<int> vertexFaces = new List<int>();
+                foreach (int[] f in this.faceList)
+                {
+                    vertexFaces.Add(f[0]);
+                }
+                return vertexFaces;
+            }
+        }
+
+        public List<Vector3> VertexList
+        {
+            get
+            {
+                return this.vertexList;
+            }
+        }
+
         /// <summary>
         /// Parse each line and assign it's value to it's respective variable.
         /// </summary>
