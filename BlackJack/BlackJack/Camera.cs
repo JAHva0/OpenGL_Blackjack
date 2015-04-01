@@ -39,6 +39,14 @@ namespace BlackJack
             } 
         }
 
+        public static Vector3 CurrentLocation
+        {
+            get
+            {
+                return cameraeyelocation;
+            }
+        }
+
         /// <summary>
         /// Initializes the camera's matrices and Uniform Buffer.
         /// </summary>
@@ -75,6 +83,12 @@ namespace BlackJack
             UpdateCameraInfo();
         }
 
+        public static void SetPosition(Vector3 new_position)
+        {
+            cameraeyelocation = new_position;
+            UpdateCameraInfo();
+        }
+
         /// <summary>
         /// Moves the camera in the Z direction the specified amount.
         /// </summary>
@@ -97,35 +111,40 @@ namespace BlackJack
             GL.BindBuffer(BufferTarget.UniformBuffer, 0);
         }
 
+        public static Vector3 GetRaycast(float x, float y)
+        {
+            // Get 3d Normalized Device Coordinates - i.e. the mouse position on the eye of the camera
+            Vector3 ray_nds = new Vector3();
+            ray_nds.X = 2.0f * x / (float)windowSize.Width - 1.0f;
+            ray_nds.Y = -(2.0f * y / (float)windowSize.Height - 1.0f);
+            ray_nds.Z = 1.0f;
+
+            Vector4 ray_clip = new Vector4(ray_nds.X, ray_nds.Y, -1.0f, 1.0f);
+
+            Matrix4 projInverse = Matrix4.Invert(matricies.Perspective);
+
+            Vector4 ray_eye = Vector4.Transform(ray_clip, projInverse);
+            ray_eye.Z = -1.0f;
+            ray_eye.W = 0.0f;
+
+            Matrix4 viewInverse = Matrix4.Invert(matricies.View);
+            Vector4 ray_wor = Vector4.Transform(ray_eye, viewInverse);
+
+            Vector3 finalray = ray_wor.Xyz;
+
+            finalray.Normalize();
+
+            return finalray;
+        }
+
         /// <summary>
         /// Gets a raycast from the provided screen coordinates of the mouse.
         /// </summary>
         /// <param name="mousePosition">The Location of the mouse on the window.</param>
         /// <returns>A raycast from the mouse position through the scene. </returns>
-        public static Vector4 GetRaycast(Vector2 mousePosition)
+        public static Vector3 GetRaycast(Vector2 mousePosition)
         {
-            // Create a vector from the mouse's position
-            Vector4 vec = new Vector4();
-
-            vec.X = 2.0f * mousePosition.X / (float)windowSize.Width - 1;
-            vec.Y = -(2.0f * mousePosition.Y / (float)windowSize.Height - 1);
-            vec.Z = 0f;
-            vec.W = 1.0f;
-
-            Matrix4 viewInverse = Matrix4.Invert(matricies.View);
-            Matrix4 projInverse = Matrix4.Invert(matricies.Perspective);
-
-            Vector4.Transform(ref vec, ref projInverse, out vec);
-            Vector4.Transform(ref vec, ref viewInverse, out vec);
-
-            if (vec.W > float.Epsilon || vec.W < float.Epsilon)
-            {
-                vec.X /= vec.W;
-                vec.Y /= vec.W;
-                vec.Z /= vec.W;
-            }
-
-            return vec;
+            return GetRaycast(mousePosition.X, mousePosition.Y);
         }
 
         /// <summary>

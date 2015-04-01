@@ -3,6 +3,7 @@
 namespace BlackJack
 {
     using System;
+    using System.Collections.Generic;
     using System.Drawing;
     using System.Drawing.Imaging;
     using OpenTK;
@@ -31,6 +32,9 @@ namespace BlackJack
         /// <summary> The number of points in this object. Used by the render method. </summary>
         private int indexCount;
 
+        /// <summary> Holds the data for the collision model, if needed. </summary>
+        private CollisionModel collision;
+
         //// -----------------------Uniforms-----------------------
 
         /// <summary> The Uniform Block reference for the camera matrices. </summary>
@@ -53,12 +57,19 @@ namespace BlackJack
         /// <summary> The value to pass to the scale uniform. </summary>
         private Matrix4 scale = Matrix4.Identity;
 
-        public BaseGLObject(string shaderProgramName, string VertShader, string FragShader)
+        /// <summary>
+        /// Initializes a new instance of the <see cref="BaseGLObject"/> class. 
+        /// Intended for use by derived classes which provide their own model data. 
+        /// </summary>
+        /// <param name="shaderProgramName">The name of the shader program to use/create.</param>
+        /// <param name="vertShader">The Vertex Shader to use.</param>
+        /// <param name="fragShader">The Fragment Shader to use.</param>
+        public BaseGLObject(string shaderProgramName, string vertShader, string fragShader)
         {
             // If no shader program called Basic exists, create one
             if (!Shaders.ProgramList.ContainsKey(shaderProgramName))
             {
-                Shaders.CreateNewProgram(shaderProgramName, Shaders.ShaderList[VertShader], Shaders.ShaderList[FragShader]);
+                Shaders.CreateNewProgram(shaderProgramName, Shaders.ShaderList[vertShader], Shaders.ShaderList[fragShader]);
             }
 
             // Store the program handle.
@@ -75,15 +86,16 @@ namespace BlackJack
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="BaseGLObject"/> class. 
-        /// The blank constructor just creates a basic card for testing.
+        /// Initializes a new instance of the <see cref="BaseGLObject"/> class.
         /// </summary>
-        public BaseGLObject(string modelFile, string textureFile, string shaderProgramName, string VertShader, string FragShader)
+        /// <param name="model"> The model to use.</param>
+        /// <param name="textureFile"> The texture to apply to the model.</param>
+        /// <param name="shaderProgramName">The name of the shader program to use/create.</param>
+        /// <param name="VertShader">The Vertex Shader to use.</param>
+        /// <param name="FragShader">The Fragment Shader to use.</param>
+        public BaseGLObject(Mesh model, string textureFile, string shaderProgramName, string VertShader, string FragShader)
             : this(shaderProgramName, VertShader, FragShader)
         {
-            // Load the basic box model
-            Mesh model = new Mesh(modelFile);
-
             GL.UseProgram(this.shaderProgram);
             GL.UniformBlockBinding(this.shaderProgram, this.globalCameraMatrix, Camera.GlobalUBO);
             GL.UniformBlockBinding(this.shaderProgram, this.globalLight, Light.LightsInScene["Main"].GlobalBindingIndex);
@@ -94,6 +106,8 @@ namespace BlackJack
             this.CreateTexture(textureFile);
 
             this.InitialzeVertexObject();
+
+            this.collision = new CollisionModel(model.VertexFaceList, model.VertexList);
         }
 
         /// <summary> Gets the handle for the shader program used by this object. </summary>
@@ -103,6 +117,23 @@ namespace BlackJack
             get
             {
                 return this.shaderProgram;
+            }
+        }
+
+        /// <summary>
+        /// Checks the collision model for an intersection with the provided vector.
+        /// </summary>
+        /// <param name="vec">The vector to check along.</param>
+        /// <returns>True if the vector hit part of the collision model.</returns>
+        public bool CheckForCollision(Vector3 vec)
+        {
+            if (this.collision != null)
+            {
+                return this.collision.CheckForCollision(new Vector3(vec));
+            }
+            else
+            {
+                return false;
             }
         }
 
@@ -196,6 +227,10 @@ namespace BlackJack
             this.indexCount = model.Indicies.Length;
         }
 
+        /// <summary>
+        /// Updates the stored buffer objects with new data.
+        /// </summary>
+        /// <param name="model">The new model data to load to the buffer.</param>
         internal void UpdateBufferObjects(Mesh model)
         {
             GL.BindBuffer(BufferTarget.ArrayBuffer, this.vertexBufferObject);
@@ -259,6 +294,108 @@ namespace BlackJack
 
             GL.ActiveTexture(TextureUnit.Texture0);
             GL.BindTexture(TextureTarget.Texture2D, this.textureBufferObject);
+        }
+
+        /// <summary>
+        /// Holds list of indexed Vectors that represent the collision model for this object.
+        /// </summary>
+        private class CollisionModel
+        {
+            /// <summary> The face index order for the collision model. </summary>
+            private List<int> faceList;
+
+            /// <summary>  </summary>
+            private List<Vector3> vertexList;
+            
+            public CollisionModel(List<int> faces, List<Vector3> verticies)
+            {
+                this.faceList = faces;
+                this.vertexList = verticies;
+            }
+
+            public bool CheckForCollision(Vector3 vec)
+            {
+                List<int[]> hitFaces = new List<int[]>();
+                
+                Vector3 D = vec;
+                Vector3 O = Camera.CurrentLocation; // Camera Eye
+                for (int f = 0; f < this.faceList.Count; f += 3)
+                {
+                    Vector3 V1 = vertexList[this.faceList[0 + f]];
+                    Vector3 V2 = vertexList[this.faceList[1 + f]];
+                    Vector3 V3 = vertexList[this.faceList[2 + f]];
+
+                    if (this.TriangleIntersection(V1, V2, V3, O, D))
+                    {
+                        hitFaces.Add(new int[] { this.faceList[0 + f], this.faceList[1 + f], this.faceList[2 + f] });
+                    }
+                }
+
+                Console.WriteLine("Hit: {0} faces", hitFaces.Count);
+                if (hitFaces.Count > 0)
+                {
+                    return true;
+                }
+                else
+                { 
+                    return false;
+                }
+            }
+
+            private bool TriangleIntersection(Vector3 V1, Vector3 V2, Vector3 V3, Vector3 O, Vector3 D)
+            {
+                Vector3 e1, e2;
+                Vector3 P, Q, T;
+                float det, inv_det, u, v;
+                float t;
+
+                // Find vectors for the two edges sharing V1
+                Vector3.Subtract(ref V2, ref V1, out e1);
+                Vector3.Subtract(ref V3, ref V1, out e2);
+
+                // Calculate the determinant
+                Vector3.Cross(ref D, ref e2, out P);
+                // If the determinant is near zero, the ray lies in the plane of the triangle
+                det = Vector3.Dot(e1, P);
+
+                if (det > -float.Epsilon && det < float.Epsilon)
+                {
+                    return false;
+                }
+
+                inv_det = 1.0f / det;
+
+                // Calculate the distance from V1 to the ray origin.
+                Vector3.Subtract(ref O, ref V1, out T);
+
+                // Calculate the u parameter and test bound
+                u = Vector3.Dot(T, P) * inv_det;
+                // The intersection lies outside of the triangle
+                if (u < 0.0f || u > 1.0f)
+                {
+                    return false;
+                }
+
+                // Prepare to test the v parameter
+                Vector3.Cross(ref T, ref e1, out Q);
+
+                // Calculate the V parameter and test the bound
+                v = Vector3.Dot(D, Q) * inv_det;
+                // The intersection lies outside of the triangle
+                if (v < 0.0f || u + v > 1.0f)
+                {
+                    return false;
+                }
+
+                t = Vector3.Dot(e2, Q) + inv_det;
+
+                if (t > float.Epsilon)
+                {
+                    return true;
+                }
+
+                return false;
+            }
         }
     }
 }
