@@ -65,6 +65,11 @@ namespace BlackJack
             {
                 return this.lightInfo.Location;
             }
+            set
+            {
+                this.lightInfo.Location = value;
+                this.UpdateLightInfo();
+            }
         }
 
         /// <summary> Gets the current color of this light. </summary>
@@ -74,6 +79,11 @@ namespace BlackJack
             get
             {
                 return this.lightInfo.Color;
+            }
+            set
+            {
+                this.lightInfo.Color = value;
+                this.UpdateLightInfo();
             }
         }
 
@@ -85,16 +95,6 @@ namespace BlackJack
             {
                 return this.globalBindingIndex;
             }
-        }
-
-        /// <summary>
-        /// Sets the position of the light to the provided Vector3.
-        /// </summary>
-        /// <param name="newPosition">The new position for this light.</param>
-        public void SetPosition(Vector3 newPosition)
-        {
-            this.lightInfo.Location = newPosition;
-            this.UpdateLightInfo();
         }
 
         /// <summary>
