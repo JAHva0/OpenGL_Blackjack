@@ -38,7 +38,7 @@ namespace BlackJack
             // If there are no fonts (i.e. this is the first text we've tried to create), load them
             if (loadedFonts.Count == 0)
             {
-                string fontFolder = Program.CurrentDirectory + @"BlackJack\BlackJack\Font\";
+                string fontFolder = Entry.CurrentDirectory + @"BlackJack\BlackJack\Font\";
                 loadedFonts.Add(new Font(fontFolder + "FontData_Arial.csv", fontFolder + "Font_Arial.bmp"));
             }
         }

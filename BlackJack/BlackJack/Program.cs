@@ -7,7 +7,7 @@ namespace BlackJack
     /// <summary>
     /// Class to hold the entry point.
     /// </summary>
-    public static class Program
+    public static class Entry
     {
         /// <summary> Gets the path of the current directory, to allow relative paths to files. </summary>
         /// <value> The current working folder. </value>
