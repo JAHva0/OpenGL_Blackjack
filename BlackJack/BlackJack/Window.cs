@@ -23,13 +23,11 @@ namespace BlackJack
         /// <summary>
         /// Testing object.
         /// </summary>
-        private BaseGLObject obj;
+        private List<BaseGLObject> objs = new List<BaseGLObject>();
 
         /// <summary> A Generic Light. </summary>
         private Light testLight;
 
-        /// <summary> A text object. </summary>
-        private Text textText;
         
         /// <summary>
         /// Initializes a new instance of the <see cref="Window"/> class.
@@ -44,14 +42,30 @@ namespace BlackJack
             this.ClientSize = windowDimensions;
 
             this.KeyDown += this.Window_KeyDown;
-            this.MouseDown += Window_MouseDown;
+            //this.MouseDown += Window_MouseDown;
+            //this.MouseMove += Window_MouseMove;
 
             FPSUpdate.Elapsed += new ElapsedEventHandler(UpdateFPSCount);
         }
 
+        void Window_MouseMove(object sender, MouseMoveEventArgs e)
+        {
+            foreach (BaseGLObject obj in this.objs)
+            {
+                obj.CheckForCollision(Camera.GetRaycast(e.X, e.Y));
+            }
+        }
+
         void Window_MouseDown(object sender, MouseButtonEventArgs e)
         {
-            Console.WriteLine(Camera.GetRaycast(new Vector2(e.X, e.Y)));
+            List<Vector3> Verticies = new List<Vector3>();
+
+            foreach (BaseGLObject obj in this.objs)
+            {
+                obj.CheckForCollision(Camera.GetRaycast(e.X, e.Y));
+            }
+            
+
         }
 
         private void UpdateFPSCount(object source, ElapsedEventArgs e)
@@ -83,7 +97,7 @@ namespace BlackJack
             GL.DepthRange(0.0f, 1.0f);
 
             // Enable Textures - Does this do anything?
-            //GL.Enable(EnableCap.Texture2D);
+            // GL.Enable(EnableCap.Texture2D);
 
             // Enable Alpha and Blending
             GL.Enable(EnableCap.Blend);
@@ -93,13 +107,14 @@ namespace BlackJack
             Shaders.Load();
             this.testLight = new Light("Main", new Vector3(0.0f, 5.0f, 5.0f), new Vector3(1.0f, 1.0f, 1.0f));
 
-            string modelFile = @"C:\Users\Jon\Documents\GitHub\OpenGL_Blackjack\BlackJack\BlackJack\Models\Monkey.obj";
-            string textureFile = @"C:\Users\Jon\Documents\GitHub\OpenGL_Blackjack\BlackJack\BlackJack\Textures\monkey paint.png";
+            string modelFile = Entry.CurrentDirectory + @"\BlackJack\BlackJack\Models\Monkey.obj";
+            string textureFile = Entry.CurrentDirectory + @"\BlackJack\BlackJack\Textures\monkey paint.png";
 
-            obj = new BaseGLObject(modelFile, textureFile, "Basic", "VertexShader", "FragmentShader");
+            this.objs.Add(new BaseGLObject(new Mesh(modelFile), textureFile, "Basic", "VertexShader", "FragmentShader"));
 
-            this.textText = new Text("0 FPS", "Arial");
-            this.textText.SetPosition(new Vector2(-750, 400));
+            Text newText = new Text("0 FPS", "Arial");
+            newText.SetPosition(new Vector2(-750, 400));
+            this.objs.Add(newText);
         }
 
         /// <summary>
@@ -124,12 +139,22 @@ namespace BlackJack
 
             if (this.updateFPSText)
             {
-                this.textText.SetText(this.frameCount.ToString() + " FPS");
+                // this.textText.SetText(this.frameCount.ToString() + " FPS");
                 this.frameCount = 0;
                 this.updateFPSText = false;
             }
 
-            //this.obj.RotateY(0.5f);
+        
+                if (this.objs[0].CheckForCollision(Camera.GetRaycast(Mouse.X, Mouse.Y)))
+                {
+                    Light.LightsInScene["Main"].Color = new Vector3(1.0f, 1.0f, 1.0f);
+                }
+                else
+                {
+                    Light.LightsInScene["Main"].Color = new Vector3(0.0f, 0.0f, 0.0f);
+                }
+
+            this.objs[0].RotateY(0.5f);
         }
 
         /// <summary>
@@ -143,13 +168,17 @@ namespace BlackJack
 
             GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
 
-            GL.UseProgram(this.obj.ShaderProgram);
-            this.obj.Render();
-            GL.UseProgram(0);
+            foreach (int shaderProgram in Shaders.ProgramList.Values)
+            {
+                var items = this.objs.Where(x => x.ShaderProgram == shaderProgram);
 
-            GL.UseProgram(this.textText.ShaderProgram);
-            this.textText.Render();
-            GL.UseProgram(0);
+                GL.UseProgram(shaderProgram);
+                foreach (BaseGLObject obj in items)
+                {
+                    obj.Render();
+                }
+                GL.UseProgram(0);
+            }
 
             this.SwapBuffers();
         }
@@ -163,6 +192,14 @@ namespace BlackJack
         {
             switch (e.Key)
             {
+                case Key.Q:
+                    {
+                        Camera.SetPosition(new Vector3(10.0f, 10.0f, 10.0f)); break;
+                    }
+                case Key.R:
+                    {
+                        Camera.SetPosition(new Vector3(0.0f, 0.0f, 5.0f)); break;
+                    }
                 default: break;
             }
         }
